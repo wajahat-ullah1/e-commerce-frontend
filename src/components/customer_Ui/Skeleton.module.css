@@ -1,0 +1,82 @@
+.skeleton {
+  border-radius: var(--radius-md);
+  background: linear-gradient(90deg, var(--color-slate-100) 25%, var(--color-slate-200) 50%, var(--color-slate-100) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+.card {
+  background: var(--color-white);
+  border: 1px solid var(--color-slate-100);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.image {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+}
+
+.body {
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.line1 { height: 0.75rem; width: 33%; }
+.line2 { height: 1rem; width: 80%; }
+.line3 { height: 1rem; width: 50%; }
+
+.footerRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 0.25rem;
+}
+
+.priceLine { height: 1.25rem; width: 25%; }
+.buttonLine { height: 2.25rem; width: 6rem; border-radius: var(--radius-md); }
+
+.orderCard {
+  background: var(--color-white);
+  border: 1px solid var(--color-slate-100);
+  border-radius: var(--radius-lg);
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.orderTopRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.orderNumber { height: 1rem; width: 7rem; }
+.orderPill { height: 1.5rem; width: 5rem; border-radius: var(--radius-full); }
+.orderDate { height: 0.75rem; width: 10rem; }
+
+.orderItemRow {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding-top: 0.25rem;
+}
+
+.orderThumb {
+  height: 3.5rem;
+  width: 3.5rem;
+  border-radius: var(--radius-md);
+}
+
+.orderItemText {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.orderItemLine1 { height: 1rem; width: 75%; }
+.orderItemLine2 { height: 0.75rem; width: 50%; }

@@ -1,0 +1,169 @@
+/* AccountLayout.css */
+
+.account-layout {
+  min-height: 100vh;
+  background: #f8fafc;
+}
+
+.account-container {
+  max-width: 80rem;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+}
+
+.account-main {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.account-sidebar {
+  width: 100%;
+  flex-shrink: 0;
+}
+
+.account-profile-card {
+  margin-bottom: 1rem;
+  padding: 1.25rem;
+  background: #fff;
+  border: 1px solid #f1f5f9;
+  border-radius: 1rem;
+}
+
+.account-profile-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.account-profile-avatar {
+  width: 3rem;
+  height: 3rem;
+  flex-shrink: 0;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #e0e7ff;
+}
+
+.account-profile-avatar--fallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #e0e7ff;
+  border: 0;
+}
+
+.account-profile-avatar--fallback span {
+  color: #4f46e5;
+  font-size: 1.125rem;
+  font-weight: 600;
+}
+
+.account-profile-info {
+  min-width: 0;
+}
+
+.account-profile-name,
+.account-profile-email {
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.account-profile-name {
+  color: #0f172a;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.account-profile-email {
+  margin-top: 0.125rem;
+  color: #94a3b8;
+  font-size: 0.75rem;
+}
+
+.account-nav {
+  overflow: hidden;
+  background: #fff;
+  border: 1px solid #f1f5f9;
+  border-radius: 1rem;
+}
+
+.account-nav-link,
+.account-logout {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: background 0.2s ease, color 0.2s ease;
+  box-sizing: border-box;
+}
+
+.account-nav-link {
+  color: #334155;
+  border-bottom: 1px solid #f8fafc;
+}
+
+.account-nav-link:last-of-type {
+  border-bottom: 0;
+}
+
+.account-nav-link:hover {
+  background: #f8fafc;
+}
+
+.account-nav-link.is-active {
+  color: #4f46e5;
+  background: #eef2ff;
+}
+
+.account-nav-icon {
+  width: 1rem;
+  height: 1rem;
+  flex-shrink: 0;
+  color: #94a3b8;
+}
+
+.account-nav-icon.is-active {
+  color: #4f46e5;
+}
+
+.account-logout {
+  color: #ef4444;
+  text-align: left;
+  background: transparent;
+  border: 0;
+  border-top: 1px solid #f1f5f9;
+  cursor: pointer;
+}
+
+.account-logout:hover {
+  background: #fef2f2;
+}
+
+.account-content {
+  flex: 1;
+  min-width: 0;
+}
+
+@media (min-width: 640px) {
+  .account-container {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .account-main {
+    flex-direction: row;
+  }
+
+  .account-sidebar {
+    width: 16rem;
+  }
+}

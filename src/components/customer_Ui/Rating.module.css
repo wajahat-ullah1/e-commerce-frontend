@@ -1,0 +1,52 @@
+.wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.stars {
+  display: flex;
+  align-items: center;
+  gap: 0.125rem;
+}
+
+.sm { width: 0.875rem; height: 0.875rem; }
+.md { width: 1rem; height: 1rem; }
+.lg { width: 1.25rem; height: 1.25rem; }
+
+.starFilled {
+  color: #fbbf24;
+}
+
+.starEmpty {
+  color: var(--color-slate-200);
+}
+
+.valueText {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-slate-700);
+}
+
+.countText {
+  font-size: 0.875rem;
+  color: var(--color-slate-400);
+}
+
+.selectorButton {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  transition: transform 0.2s ease;
+}
+
+.selectorButton:hover {
+  transform: scale(1.1);
+}
+
+.selectorStar {
+  width: 2rem;
+  height: 2rem;
+  transition: color 0.2s ease;
+}

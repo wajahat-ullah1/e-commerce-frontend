@@ -1,0 +1,278 @@
+/* =========================================================
+   Notifications Page
+   ========================================================= */
+
+.notifications-page {
+  width: 100%;
+  max-width: 672px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  box-sizing: border-box;
+}
+
+.notifications-page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.notifications-title {
+  margin: 0;
+  color: #111827;
+  font-family: "Plus Jakarta Sans", sans-serif;
+  font-size: 20px;
+  line-height: 28px;
+  font-weight: 700;
+}
+
+.notifications-subtitle {
+  margin: 2px 0 0;
+  color: #6b7280;
+  font-size: 14px;
+  line-height: 20px;
+}
+
+.notifications-button-icon {
+  width: 14px;
+  height: 14px;
+}
+
+/* =========================================================
+   Notifications Card
+   ========================================================= */
+
+.notifications-card {
+  overflow: hidden;
+}
+
+/* =========================================================
+   Notification Item
+   ========================================================= */
+
+.notification-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 16px 20px;
+  border-bottom: 1px solid #f9fafb;
+  transition: background-color 0.15s ease;
+}
+
+.notification-item:last-child {
+  border-bottom: none;
+}
+
+.notification-unread {
+  background: rgba(238, 242, 255, 0.3);
+}
+
+.notification-read:hover {
+  background: rgba(249, 250, 251, 0.6);
+}
+
+/* =========================================================
+   Notification Type Icon
+   ========================================================= */
+
+.notification-type-icon {
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.notification-type-icon svg {
+  width: 16px;
+  height: 16px;
+}
+
+.notification-icon-indigo {
+  background: #eef2ff;
+  color: #4f46e5;
+}
+
+.notification-icon-amber {
+  background: #fffbeb;
+  color: #d97706;
+}
+
+.notification-icon-yellow {
+  background: #fefce8;
+  color: #ca8a04;
+}
+
+.notification-icon-emerald {
+  background: #ecfdf5;
+  color: #059669;
+}
+
+.notification-icon-default {
+  background: #f3f4f6;
+  color: #6b7280;
+}
+
+/* =========================================================
+   Notification Content
+   ========================================================= */
+
+.notification-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.notification-main {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.notification-text {
+  min-width: 0;
+}
+
+.notification-title-text {
+  margin: 0;
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 500;
+}
+
+.notification-title-unread {
+  color: #111827;
+}
+
+.notification-title-read {
+  color: #374151;
+}
+
+.notification-message {
+  margin: 2px 0 0;
+  color: #6b7280;
+  font-size: 14px;
+  line-height: 20px;
+}
+
+.notification-time {
+  margin: 4px 0 0;
+  color: #9ca3af;
+  font-size: 12px;
+  line-height: 18px;
+}
+
+/* =========================================================
+   Read Action
+   ========================================================= */
+
+.notification-read-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.notification-unread-dot {
+  width: 8px;
+  height: 8px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: #6366f1;
+}
+
+.notification-read-button {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #9ca3af;
+  font-size: 12px;
+  line-height: 18px;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: color 0.15s ease;
+}
+
+.notification-read-button:hover {
+  color: #4f46e5;
+}
+
+.notification-read-button svg {
+  width: 12px;
+  height: 12px;
+}
+
+/* =========================================================
+   Empty State
+   ========================================================= */
+
+.notifications-empty {
+  padding: 64px 20px;
+  text-align: center;
+}
+
+.notifications-empty-icon {
+  width: 48px;
+  height: 48px;
+  margin: 0 auto 12px;
+  border-radius: 12px;
+  background: #f3f4f6;
+  color: #d1d5db;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.notifications-empty-icon svg {
+  width: 24px;
+  height: 24px;
+}
+
+.notifications-empty-title {
+  margin: 0;
+  color: #6b7280;
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 500;
+}
+
+/* =========================================================
+   Responsive
+   ========================================================= */
+
+@media (max-width: 768px) {
+  .notifications-page {
+    padding: 18px;
+  }
+}
+
+@media (max-width: 520px) {
+  .notifications-page {
+    padding: 14px;
+  }
+
+  .notifications-page-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .notification-item {
+    gap: 12px;
+    padding: 14px;
+  }
+
+  .notification-main {
+    flex-direction: column;
+  }
+
+  .notification-read-actions {
+    align-self: flex-end;
+  }
+}
