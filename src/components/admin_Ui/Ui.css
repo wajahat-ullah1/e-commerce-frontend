@@ -42,7 +42,6 @@
   color: #4b5563;
 }
 
-
 /* =========================================================
    Button
    ========================================================= */
@@ -82,7 +81,6 @@
   opacity: 0.5;
   cursor: not-allowed;
 }
-
 
 /* Button variants */
 
@@ -136,7 +134,6 @@
   background: #eef2ff;
 }
 
-
 /* Button sizes */
 
 .ui-button-sm {
@@ -153,7 +150,6 @@
   padding: 10px 20px;
   font-size: 14px;
 }
-
 
 /* Loading spinner */
 
@@ -180,7 +176,6 @@
     transform: rotate(360deg);
   }
 }
-
 
 /* =========================================================
    Input
@@ -231,8 +226,7 @@
 
 .ui-input:focus {
   border-color: transparent;
-  box-shadow:
-    0 0 0 2px rgba(99, 102, 241, 0.2);
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
 }
 
 .ui-input-with-icon {
@@ -268,7 +262,6 @@
   font-size: 12px;
   line-height: 18px;
 }
-
 
 /* =========================================================
    Select
@@ -308,10 +301,8 @@
 
 .ui-select:focus {
   border-color: #6366f1;
-  box-shadow:
-    0 0 0 2px rgba(99, 102, 241, 0.15);
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.15);
 }
-
 
 /* =========================================================
    Card
@@ -324,10 +315,8 @@
 
   border: 1px solid #f3f4f6;
 
-  box-shadow:
-    0 1px 2px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
 }
-
 
 /* =========================================================
    Star Rating
@@ -350,7 +339,6 @@
 .ui-star-inactive {
   color: #e5e7eb;
 }
-
 
 /* =========================================================
    Toast
@@ -375,16 +363,14 @@
 
   border: 1px solid;
 
-  box-shadow:
-    0 10px 25px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
 
   color: #1f2937;
 
   font-size: 14px;
   font-weight: 500;
 
-  animation:
-    ui-toast-in 200ms ease-out;
+  animation: ui-toast-in 200ms ease-out;
 }
 
 .toast-icon-success {
@@ -476,7 +462,6 @@
   }
 }
 
-
 /* =========================================================
    Modal
    ========================================================= */
@@ -516,8 +501,7 @@
 
   border-radius: 16px;
 
-  box-shadow:
-    0 25px 50px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.2);
 
   overflow: hidden;
 }
@@ -577,7 +561,6 @@
   padding: 20px 24px;
 }
 
-
 /* =========================================================
    Confirm Dialog
    ========================================================= */
@@ -598,7 +581,6 @@
 
   gap: 12px;
 }
-
 
 /* =========================================================
    Empty State
@@ -656,7 +638,6 @@
   font-size: 14px;
   line-height: 20px;
 }
-
 
 /* =========================================================
    Stat Card
@@ -724,9 +705,7 @@
 
   font-weight: 700;
 
-  font-family:
-    "Plus Jakarta Sans",
-    sans-serif;
+  font-family: "Plus Jakarta Sans", sans-serif;
 }
 
 .ui-stat-label {
@@ -746,7 +725,6 @@
   font-size: 12px;
   line-height: 18px;
 }
-
 
 /* =========================================================
    Pagination
@@ -812,7 +790,6 @@
   background: #4338ca;
 }
 
-
 /* =========================================================
    Skeleton
    ========================================================= */
@@ -822,8 +799,7 @@
 
   border-radius: 8px;
 
-  animation:
-    ui-skeleton-pulse 1.5s ease-in-out infinite;
+  animation: ui-skeleton-pulse 1.5s ease-in-out infinite;
 }
 
 @keyframes ui-skeleton-pulse {
@@ -837,22 +813,18 @@
   }
 }
 
-
 /* =========================================================
    Avatar
    ========================================================= */
 
 .ui-avatar {
   border-radius: 999px;
-
   display: flex;
-
   align-items: center;
   justify-content: center;
-
   font-weight: 600;
-
   flex-shrink: 0;
+  object-fit: cover;
 }
 
 .ui-avatar-sm {
@@ -875,7 +847,6 @@
 
   font-size: 16px;
 }
-
 
 /* Avatar colors */
 
@@ -904,13 +875,11 @@
   color: #b45309;
 }
 
-
 /* =========================================================
    Responsive
    ========================================================= */
 
 @media (max-width: 640px) {
-
   .ui-toast {
     left: 16px;
     right: 16px;
@@ -953,4 +922,39 @@
   .ui-modal-header {
     padding: 14px 18px;
   }
+}
+
+/* =========================================================
+   Error Dialog
+   ========================================================= */
+
+.ui-error-dialog-body {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 4px;
+}
+
+.ui-error-dialog-icon {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #fef2f2;
+  color: #dc2626;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ui-error-dialog-icon svg {
+  width: 20px;
+  height: 20px;
+}
+
+.ui-error-dialog-message {
+  color: #475569;
+  line-height: 1.5;
+  margin: 0;
+  padding-top: 8px;
 }

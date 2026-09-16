@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import {
   Search,
   Eye,
@@ -14,14 +15,31 @@ import {
   Avatar,
   EmptyState,
   Pagination,
-  Stars,
 } from "../../components/admin_Ui/Ui";
-import { customers, recentOrders, reviews } from "../../data/mockData";
+import { customerService } from "../../services/customerService";
+import { orderService } from "../../services/orderService";
+import { useApp } from "../../context/AppContext";
 import "./Customers.css";
 
-export default function Customers({ onNavigate }) {
+export default function Customers() {
+  const navigate = useNavigate();
+  const { showToast } = useApp();
+
+  const [customers, setCustomers] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
+
+  useEffect(() => {
+    setLoading(true);
+    customerService
+      .list()
+      .then(setCustomers)
+      .catch((err) =>
+        showToast("error", err.message || "Failed to load customers"),
+      )
+      .finally(() => setLoading(false));
+  }, []);
 
   const filtered = customers.filter(
     (customer) =>
@@ -30,27 +48,22 @@ export default function Customers({ onNavigate }) {
   );
 
   const perPage = 8;
-
   const paginated = filtered.slice((page - 1) * perPage, page * perPage);
 
   return (
     <div className="customers-page">
-      {/* Header */}
       <div className="customers-header">
         <div>
           <h1 className="customers-title">Customers</h1>
-
           <p className="customers-subtitle">
             {customers.length} registered customers
           </p>
         </div>
       </div>
 
-      {/* Search */}
       <Card className="customers-search-card">
         <div className="customers-search-wrapper">
           <Search className="customers-search-icon" />
-
           <input
             value={search}
             onChange={(e) => {
@@ -63,9 +76,10 @@ export default function Customers({ onNavigate }) {
         </div>
       </Card>
 
-      {/* Customers Table */}
       <Card className="customers-table-card">
-        {filtered.length === 0 ? (
+        {loading ? (
+          <div className="customers-loading">Loading customers...</div>
+        ) : filtered.length === 0 ? (
           <EmptyState
             icon={<Search className="customers-empty-icon" />}
             title="No customers found"
@@ -88,68 +102,57 @@ export default function Customers({ onNavigate }) {
                     ].map((heading, index) => (
                       <th
                         key={index}
-                        className={`customers-th ${
-                          index === 7
-                            ? "customers-th-right"
-                            : "customers-th-left"
-                        }`}
+                        className={`customers-th ${index === 7 ? "customers-th-right" : "customers-th-left"}`}
                       >
                         {heading}
                       </th>
                     ))}
                   </tr>
                 </thead>
-
                 <tbody>
                   {paginated.map((customer) => (
                     <tr key={customer.id} className="customers-table-row">
-                      {/* Customer */}
                       <td className="customers-td">
                         <div className="customers-profile">
-                          <Avatar initials={customer.avatar} />
-
+                          <Avatar
+                            src={customer.profileImage}
+                            initials={customer.name?.charAt(0).toUpperCase()}
+                          />
                           <div>
                             <p className="customers-name">{customer.name}</p>
-
                             <p className="customers-id">{customer.id}</p>
                           </div>
                         </div>
                       </td>
-
-                      {/* Email */}
                       <td className="customers-td customers-text">
                         {customer.email}
                       </td>
-
-                      {/* Phone */}
                       <td className="customers-td customers-text customers-nowrap">
                         {customer.phone}
                       </td>
-
-                      {/* Orders */}
                       <td className="customers-td customers-orders">
                         {customer.orders}
                       </td>
-
-                      {/* Total Spent */}
                       <td className="customers-td customers-spent">
                         ${customer.spent.toFixed(2)}
                       </td>
-
-                      {/* Joined */}
                       <td className="customers-td customers-text customers-nowrap">
-                        {customer.joined}
+                        {new Date(customer.joinedAt).toLocaleDateString(
+                          "en-GB",
+                        )}
                       </td>
-
-                      {/* Status */}
                       <td className="customers-td">
-                        <StatusBadge status={customer.status} />
+                        <StatusBadge
+                          status={
+                            customer.status === "ACTIVE" ? "Active" : "Inactive"
+                          }
+                        />
                       </td>
-
-                      {/* View */}
                       <td className="customers-td customers-view-cell">
                         <button
-                          onClick={() => onNavigate("customer-detail")}
+                          onClick={() =>
+                            navigate(`/admin/customers/${customer.id}`)
+                          }
                           className="customers-view-button"
                           aria-label="View customer"
                         >
@@ -161,8 +164,6 @@ export default function Customers({ onNavigate }) {
                 </tbody>
               </table>
             </div>
-
-            {/* Pagination */}
             <div className="customers-pagination">
               <Pagination
                 page={page}
@@ -182,12 +183,41 @@ export default function Customers({ onNavigate }) {
 // Customer Detail
 // ─────────────────────────────────────────────────────────────
 
-export function CustomerDetail({ onNavigate }) {
-  const customer = customers[0];
+export function CustomerDetail() {
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const { showToast } = useApp();
 
-  const customerReviews = reviews.filter(
-    (review) => review.customer === customer.name,
-  );
+  const [customer, setCustomer] = useState(null);
+  const [customerOrders, setCustomerOrders] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    setLoading(true);
+    Promise.all([customerService.list(), orderService.list()])
+      .then(([customers, orders]) => {
+        const found = customers.find((c) => String(c.id) === String(id));
+        if (!found) throw new Error("Customer not found");
+        setCustomer(found);
+        setCustomerOrders(
+          orders.filter((o) => String(o.userId) === String(id)),
+        );
+      })
+      .catch((err) => showToast("error", err.message))
+      .finally(() => setLoading(false));
+  }, [id]);
+
+  if (loading)
+    return <div className="customer-detail-page">Loading customer…</div>;
+  if (!customer)
+    return <div className="customer-detail-page">Customer not found.</div>;
+
+  const completed = customerOrders.filter(
+    (o) => o.status === "DELIVERED",
+  ).length;
+  const cancelled = customerOrders.filter(
+    (o) => o.status === "CANCELLED",
+  ).length;
 
   const statistics = [
     {
@@ -199,13 +229,13 @@ export function CustomerDetail({ onNavigate }) {
     {
       icon: <CheckCircle />,
       label: "Completed",
-      value: Math.floor(customer.orders * 0.7),
+      value: completed,
       className: "customers-stat-emerald",
     },
     {
       icon: <XCircle />,
       label: "Cancelled",
-      value: Math.floor(customer.orders * 0.1),
+      value: cancelled,
       className: "customers-stat-red",
     },
     {
@@ -218,45 +248,41 @@ export function CustomerDetail({ onNavigate }) {
 
   return (
     <div className="customer-detail-page">
-      {/* Back */}
       <button
-        onClick={() => onNavigate("customers")}
+        onClick={() => navigate("/admin/customers")}
         className="customer-detail-back"
       >
         ← All Customers
       </button>
 
-      {/* Profile + Statistics */}
       <div className="customer-detail-top">
-        {/* Profile Card */}
         <Card className="customer-profile-card">
-          <Avatar initials={customer.avatar} size="lg" />
-
+          <Avatar
+            src={customer.profileImage}
+            initials={customer.name?.charAt(0).toUpperCase()}
+            size="lg"
+          />
           <h2 className="customer-profile-name">{customer.name}</h2>
-
           <p className="customer-profile-info">{customer.email}</p>
-
           <p className="customer-profile-info">{customer.phone}</p>
-
-          <p className="customer-profile-joined">Joined {customer.joined}</p>
-
-          <StatusBadge status={customer.status} />
+          <p className="customer-profile-joined">
+            Joined {new Date(customer.joinedAt).toLocaleDateString("en-GB")}
+          </p>
+          <StatusBadge
+            status={customer.status === "ACTIVE" ? "Active" : "Inactive"}
+          />
         </Card>
 
-        {/* Statistics */}
         <Card className="customer-statistics-card">
           <h2 className="customer-detail-section-title">Customer Statistics</h2>
-
           <div className="customer-statistics-grid">
             {statistics.map((stat) => (
               <div key={stat.label} className="customer-stat-item">
                 <div className={`customer-stat-icon ${stat.className}`}>
                   {stat.icon}
                 </div>
-
                 <div>
                   <p className="customer-stat-label">{stat.label}</p>
-
                   <p className="customer-stat-value">{stat.value}</p>
                 </div>
               </div>
@@ -265,68 +291,43 @@ export function CustomerDetail({ onNavigate }) {
         </Card>
       </div>
 
-      {/* Recent Orders */}
       <Card className="customer-detail-card">
         <div className="customer-detail-card-header">
           <h2 className="customer-detail-section-title">Recent Orders</h2>
         </div>
-
-        <div className="customer-detail-table-wrapper">
-          <table className="customer-detail-table">
-            <thead>
-              <tr>
-                <th>Order</th>
-                <th>Date</th>
-                <th className="customer-detail-th-right">Total</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-
-            <tbody>
-              {recentOrders.slice(0, 4).map((order) => (
-                <tr key={order.id}>
-                  <td className="customer-order-id">{order.id}</td>
-
-                  <td className="customer-order-date">{order.date}</td>
-
-                  <td className="customer-order-total">
-                    ${order.total.toFixed(2)}
-                  </td>
-
-                  <td>
-                    <StatusBadge status={order.status} />
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </Card>
-
-      {/* Reviews */}
-      <Card className="customer-detail-card">
-        <div className="customer-detail-card-header">
-          <h2 className="customer-detail-section-title">Customer Reviews</h2>
-        </div>
-
-        {customerReviews.length === 0 ? (
+        {customerOrders.length === 0 ? (
           <div className="customer-no-reviews">
-            No reviews from this customer.
+            No orders from this customer yet.
           </div>
         ) : (
-          customerReviews.map((review) => (
-            <div key={review.id} className="customer-review">
-              <div className="customer-review-header">
-                <p className="customer-review-product">{review.product}</p>
-
-                <Stars rating={review.rating} />
-              </div>
-
-              <p className="customer-review-comment">{review.comment}</p>
-
-              <p className="customer-review-date">{review.date}</p>
-            </div>
-          ))
+          <div className="customer-detail-table-wrapper">
+            <table className="customer-detail-table">
+              <thead>
+                <tr>
+                  <th>Order</th>
+                  <th>Date</th>
+                  <th className="customer-detail-th-right">Total</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {customerOrders.slice(0, 4).map((order) => (
+                  <tr key={order.id}>
+                    <td className="customer-order-id">ORD-{order.id}</td>
+                    <td className="customer-order-date">
+                      {new Date(order.createdAt).toLocaleDateString("en-GB")}
+                    </td>
+                    <td className="customer-order-total">
+                      ${Number(order.totalAmount).toFixed(2)}
+                    </td>
+                    <td>
+                      <StatusBadge status={order.status} />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         )}
       </Card>
     </div>

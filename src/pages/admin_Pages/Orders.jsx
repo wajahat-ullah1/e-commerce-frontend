@@ -1,5 +1,6 @@
-import { useState } from "react";
-import { Search, Eye, Download } from "lucide-react";
+import { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { Search, Eye } from "lucide-react";
 import {
   Card,
   Button,
@@ -7,53 +8,73 @@ import {
   EmptyState,
   Pagination,
 } from "../../components/admin_Ui/Ui";
-import { recentOrders as initialOrders } from "../../data/mockData";
+import { useFetch } from "../../hooks/useFetch";
+import { orderService } from "../../services/orderService";
+import { useApp } from "../../context/AppContext";
 import "./Orders.css";
 
-export default function Orders({ onNavigate }) {
+function formatStatus(s) {
+  if (!s) return s;
+  return s
+    .toLowerCase()
+    .split("_")
+    .map((w) => w[0].toUpperCase() + w.slice(1))
+    .join(" ");
+}
+
+const ORDER_STATUSES = [
+  "PENDING",
+  "PROCESSING",
+  "SHIPPED",
+  "IN_TRANSIT",
+  "DELIVERED",
+  "CANCELLED",
+  "RETURNED",
+];
+const PAYMENT_STATUSES = ["PENDING", "PAID", "FAILED", "REFUNDED"];
+
+export default function Orders() {
+  const navigate = useNavigate();
+  const {
+    data: orders,
+    loading,
+    error,
+  } = useFetch(() => orderService.list(), []);
+
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [payFilter, setPayFilter] = useState("all");
   const [page, setPage] = useState(1);
 
-  const filtered = initialOrders.filter((o) => {
+  const list = orders || [];
+
+  const filtered = list.filter((o) => {
     const matchSearch =
-      o.id.toLowerCase().includes(search.toLowerCase()) ||
-      o.customer.toLowerCase().includes(search.toLowerCase());
-
-    const matchStatus =
-      statusFilter === "all" ||
-      o.status === statusFilter;
-
-    const matchPay =
-      payFilter === "all" ||
-      o.paymentStatus === payFilter;
-
+      String(o.id).includes(search) ||
+      (o.customerName || "").toLowerCase().includes(search.toLowerCase());
+    const matchStatus = statusFilter === "all" || o.status === statusFilter;
+    const matchPay = payFilter === "all" || o.paymentStatus === payFilter;
     return matchSearch && matchStatus && matchPay;
   });
 
   const perPage = 10;
+  const paginated = filtered.slice((page - 1) * perPage, page * perPage);
 
-  const paginated = filtered.slice(
-    (page - 1) * perPage,
-    page * perPage
-  );
+  if (loading) return <div className="orders-page">Loading orders…</div>;
+  if (error)
+    return <div className="orders-page">Failed to load orders: {error}</div>;
 
   return (
     <div className="orders-page">
       <div className="orders-page-header">
         <h1 className="orders-title">Orders</h1>
-
-        <p className="orders-subtitle">
-          {initialOrders.length} orders total
-        </p>
+        <p className="orders-subtitle">{list.length} orders total</p>
       </div>
 
       <Card className="orders-filter-card">
         <div className="orders-filters">
           <div className="orders-search">
             <Search className="orders-search-icon" />
-
             <input
               value={search}
               onChange={(e) => {
@@ -74,18 +95,9 @@ export default function Orders({ onNavigate }) {
             className="orders-filter-select"
           >
             <option value="all">All Statuses</option>
-
-            {[
-              "Pending",
-              "Processing",
-              "Shipped",
-              "In Transit",
-              "Delivered",
-              "Cancelled",
-              "Returned",
-            ].map((s) => (
+            {ORDER_STATUSES.map((s) => (
               <option key={s} value={s}>
-                {s}
+                {formatStatus(s)}
               </option>
             ))}
           </select>
@@ -99,15 +111,9 @@ export default function Orders({ onNavigate }) {
             className="orders-filter-select"
           >
             <option value="all">All Payments</option>
-
-            {[
-              "Pending",
-              "Paid",
-              "Failed",
-              "Refunded",
-            ].map((s) => (
+            {PAYMENT_STATUSES.map((s) => (
               <option key={s} value={s}>
-                {s}
+                {formatStatus(s)}
               </option>
             ))}
           </select>
@@ -141,9 +147,7 @@ export default function Orders({ onNavigate }) {
                       <th
                         key={heading}
                         className={
-                          index === 8
-                            ? "orders-th-right"
-                            : "orders-th-left"
+                          index === 8 ? "orders-th-right" : "orders-th-left"
                         }
                       >
                         {heading}
@@ -151,57 +155,38 @@ export default function Orders({ onNavigate }) {
                     ))}
                   </tr>
                 </thead>
-
                 <tbody>
                   {paginated.map((o) => (
                     <tr key={o.id}>
-                      <td className="orders-id">
-                        {o.id}
-                      </td>
-
+                      <td className="orders-id">ORD-{o.id}</td>
                       <td>
                         <div className="orders-customer-name">
-                          {o.customer}
+                          {o.customerName}
                         </div>
-
                         <div className="orders-customer-email">
-                          {o.email}
+                          {o.customerEmail}
                         </div>
                       </td>
-
                       <td className="orders-date">
-                        {o.date}
+                        {new Date(o.createdAt).toLocaleDateString("en-GB")}
                       </td>
-
                       <td className="orders-items">
-                        {o.items} item
-                        {o.items !== 1 ? "s" : ""}
+                        {o.items.length} item{o.items.length !== 1 ? "s" : ""}
                       </td>
-
                       <td className="orders-total">
-                        ${o.total.toFixed(2)}
+                        ${Number(o.totalAmount).toFixed(2)}
                       </td>
-
-                      <td className="orders-payment">
-                        {o.payment}
-                      </td>
-
+                      <td className="orders-payment">{o.paymentMethod}</td>
                       <td>
-                        <StatusBadge
-                          status={o.paymentStatus}
-                        />
+                        <StatusBadge status={formatStatus(o.paymentStatus)} />
                       </td>
-
                       <td>
-                        <StatusBadge status={o.status} />
+                        <StatusBadge status={formatStatus(o.status)} />
                       </td>
-
                       <td className="orders-action-cell">
                         <button
                           type="button"
-                          onClick={() =>
-                            onNavigate("order-detail")
-                          }
+                          onClick={() => navigate(`/admin/orders/${o.id}`)}
                           className="orders-view-button"
                           aria-label="View order"
                         >
@@ -213,7 +198,6 @@ export default function Orders({ onNavigate }) {
                 </tbody>
               </table>
             </div>
-
             <div className="orders-pagination">
               <Pagination
                 page={page}
@@ -229,72 +213,79 @@ export default function Orders({ onNavigate }) {
   );
 }
 
-export function OrderDetail({
-  onNavigate,
-  showToast,
-}) {
-  const [status, setStatus] = useState("Processing");
-  const [showUpdate, setShowUpdate] = useState(false);
-  const [newStatus, setNewStatus] = useState(status);
+export function OrderDetail() {
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const { showToast } = useApp();
 
-  const order = {
-    id: "ORD-10023",
-    date: "Dec 11, 2026",
-    paymentStatus: "Pending",
-    total: 284.5,
-    subtotal: 270.0,
-    shipping: 14.5,
-    customer: {
-      name: "Marcus Webb",
-      email: "m.webb@email.com",
-      phone: "+1 (555) 201-3847",
-      id: "CUS-001",
-    },
-    address: {
-      line1: "742 Evergreen Terrace",
-      line2: "Apt 4B",
-      city: "Springfield",
-      state: "Illinois",
-      zip: "62701",
-      country: "United States",
-    },
-    items: [
-      {
-        name: "Premium Wireless Headphones",
-        qty: 2,
-        price: 149.99,
-        image:
-          "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=60&h=60&fit=crop&auto=format",
-      },
-      {
-        name: "Classic Leather Wallet",
-        qty: 1,
-        price: 59.99,
-        image:
-          "https://images.unsplash.com/photo-1627123424574-724758594e93?w=60&h=60&fit=crop&auto=format",
-      },
-    ],
+  const [order, setOrder] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [updating, setUpdating] = useState(false);
+
+  const allowedTransitions = {
+    PENDING: ["PROCESSING"],
+    PROCESSING: ["SHIPPED"],
+    SHIPPED: ["IN_TRANSIT"],
+    IN_TRANSIT: ["DELIVERED", "RETURNED"],
+    DELIVERED: [],
+    CANCELLED: [],
+    RETURNED: [],
   };
-
   const timeline = [
-    "Pending",
-    "Processing",
-    "Shipped",
-    "In Transit",
-    "Delivered",
+    "PENDING",
+    "PROCESSING",
+    "SHIPPED",
+    "IN_TRANSIT",
+    "DELIVERED",
   ];
 
-  const currentIdx = timeline.indexOf(status);
-
-  const updateStatus = () => {
-    setStatus(newStatus);
-    setShowUpdate(false);
-
-    showToast(
-      "Order status updated.",
-      "success"
-    );
+  const loadOrder = () => {
+    setLoading(true);
+    orderService
+      .list()
+      .then((orders) => {
+        const found = orders.find((o) => String(o.id) === String(id));
+        if (!found) throw new Error("Order not found");
+        setOrder(found);
+      })
+      .catch((err) => showToast("error", err.message))
+      .finally(() => setLoading(false));
   };
+
+  useEffect(() => {
+    loadOrder();
+  }, [id]);
+
+  const currentIdx = order ? timeline.indexOf(order.status) : -1;
+  const nextStatuses = order ? allowedTransitions[order.status] || [] : [];
+
+  const [selectedStatus, setSelectedStatus] = useState(null);
+  const canReturn =
+    order && order.status === "IN_TRANSIT" && order.paymentStatus !== "PAID";
+
+  const handleAdvanceStatus = async () => {
+    if (!selectedStatus) return;
+
+    setUpdating(true);
+
+    try {
+      await orderService.updateStatus(order.id, selectedStatus);
+
+      showToast("success", `Order moved to ${formatStatus(selectedStatus)}.`);
+
+      setShowConfirm(false);
+      setSelectedStatus(null);
+      loadOrder();
+    } catch (err) {
+      showToast("error", err.message);
+    } finally {
+      setUpdating(false);
+    }
+  };
+
+  if (loading) return <div className="order-detail-page">Loading order…</div>;
+  if (!order) return <div className="order-detail-page">Order not found.</div>;
 
   return (
     <div className="order-detail-page">
@@ -302,83 +293,60 @@ export function OrderDetail({
         <div>
           <button
             type="button"
-            onClick={() => onNavigate("orders")}
+            onClick={() => navigate("/admin/orders")}
             className="order-back-button"
           >
             ← All Orders
           </button>
-
-          <h1 className="order-detail-title">
-            {order.id}
-          </h1>
-
+          <h1 className="order-detail-title">ORD-{order.id}</h1>
           <div className="order-meta">
-            <span>{order.date}</span>
-
-            <StatusBadge status={status} />
-
-            <StatusBadge
-              status={order.paymentStatus}
-            />
+            <span>{new Date(order.createdAt).toLocaleDateString("en-GB")}</span>
+            <StatusBadge status={formatStatus(order.status)} />
+            <StatusBadge status={formatStatus(order.paymentStatus)} />
           </div>
         </div>
 
         <div className="order-detail-actions">
-          <Button variant="secondary" size="sm">
-            <Download className="order-action-icon" />
-            Invoice
-          </Button>
-
-          <Button
-            size="sm"
-            onClick={() => setShowUpdate(true)}
-          >
-            Update Status
-          </Button>
+          {nextStatuses.map((status) => (
+            <Button
+              key={status}
+              variant={status === "RETURNED" ? "secondary" : undefined}
+              size="sm"
+              onClick={() => {
+                setSelectedStatus(status);
+                setShowConfirm(true);
+              }}
+              disabled={updating}
+            >
+              {status === "RETURNED"
+                ? "Mark as Returned"
+                : `Move to ${formatStatus(status)}`}
+            </Button>
+          ))}
         </div>
       </div>
 
-      {!["Cancelled", "Returned"].includes(status) && (
+      {!["CANCELLED", "RETURNED"].includes(order.status) && (
         <Card className="order-timeline-card">
-          <h2 className="order-section-title">
-            Order Timeline
-          </h2>
-
+          <h2 className="order-section-title">Order Timeline</h2>
           <div className="order-timeline">
             {timeline.map((step, i) => (
-              <div
-                key={step}
-                className="timeline-step-wrapper"
-              >
+              <div key={step} className="timeline-step-wrapper">
                 <div className="timeline-step">
                   <div
-                    className={`timeline-circle ${
-                      i <= currentIdx
-                        ? "timeline-circle-active"
-                        : "timeline-circle-inactive"
-                    }`}
+                    className={`timeline-circle ${i <= currentIdx ? "timeline-circle-active" : "timeline-circle-inactive"}`}
                   >
                     {i < currentIdx ? "✓" : i + 1}
                   </div>
-
                   <span
-                    className={`timeline-label ${
-                      i <= currentIdx
-                        ? "timeline-label-active"
-                        : "timeline-label-inactive"
-                    }`}
+                    className={`timeline-label ${i <= currentIdx ? "timeline-label-active" : "timeline-label-inactive"}`}
                   >
-                    {step}
+                    {formatStatus(step)}
                   </span>
                 </div>
-
                 {i < timeline.length - 1 && (
                   <div
-                    className={`timeline-line ${
-                      i < currentIdx
-                        ? "timeline-line-active"
-                        : "timeline-line-inactive"
-                    }`}
+                    className={`timeline-line ${i < currentIdx ? "timeline-line-active" : "timeline-line-inactive"}`}
                   />
                 )}
               </div>
@@ -391,74 +359,37 @@ export function OrderDetail({
         <div className="order-main-column">
           <Card className="order-items-card">
             <div className="order-card-header">
-              <h2 className="order-section-title">
-                Order Items
-              </h2>
+              <h2 className="order-section-title">Order Items</h2>
             </div>
-
             {order.items.map((item) => (
-              <div
-                key={item.name}
-                className="order-item"
-              >
+              <div key={item.id} className="order-item">
                 <img
-                  src={item.image}
-                  alt={item.name}
+                  src={item.product?.image}
+                  alt={item.product?.name}
                   className="order-item-image"
                 />
-
                 <div className="order-item-info">
-                  <p className="order-item-name">
-                    {item.name}
-                  </p>
-
-                  <p className="order-item-quantity">
-                    Qty: {item.qty}
-                  </p>
+                  <p className="order-item-name">{item.product?.name}</p>
+                  <p className="order-item-quantity">Qty: {item.quantity}</p>
                 </div>
-
                 <div className="order-item-price">
                   <p className="order-item-total">
-                    $
-                    {(
-                      item.qty * item.price
-                    ).toFixed(2)}
+                    ${(item.quantity * Number(item.price)).toFixed(2)}
                   </p>
-
                   <p className="order-item-unit-price">
-                    ${item.price.toFixed(2)} each
+                    ${Number(item.price).toFixed(2)} each
                   </p>
                 </div>
               </div>
             ))}
-
             <div className="order-summary">
-              <div className="order-summary-row">
-                <span>Subtotal</span>
-                <span>
-                  ${order.subtotal.toFixed(2)}
-                </span>
-              </div>
-
-              <div className="order-summary-row">
-                <span>Shipping</span>
-                <span>
-                  ${order.shipping.toFixed(2)}
-                </span>
-              </div>
-
               <div className="order-total-row">
                 <span>Total</span>
-                <span>
-                  ${order.total.toFixed(2)}
-                </span>
+                <span>${Number(order.totalAmount).toFixed(2)}</span>
               </div>
-
               <div className="order-payment-info">
-                Payment: Cash on Delivery ·{" "}
-                <StatusBadge
-                  status={order.paymentStatus}
-                />
+                Payment: {order.paymentMethod} ·{" "}
+                <StatusBadge status={formatStatus(order.paymentStatus)} />
               </div>
             </div>
           </Card>
@@ -466,95 +397,65 @@ export function OrderDetail({
 
         <div className="order-sidebar">
           <Card className="order-info-card">
-            <h2 className="order-section-title">
-              Customer
-            </h2>
-
+            <h2 className="order-section-title">Customer</h2>
             <div className="order-customer-info">
-              <p className="order-customer-name">
-                {order.customer.name}
-              </p>
-
-              <p>{order.customer.email}</p>
-
-              <p>{order.customer.phone}</p>
-
-              <p className="order-customer-id">
-                ID: {order.customer.id}
-              </p>
+              <p className="order-customer-name">{order.customerName}</p>
+              <p>{order.customerEmail}</p>
+              <p>{order.customerPhone}</p>
+              {order.userId && (
+                <p className="order-customer-id">User ID: {order.userId}</p>
+              )}
             </div>
           </Card>
 
           <Card className="order-info-card">
-            <h2 className="order-section-title">
-              Shipping Address
-            </h2>
-
+            <h2 className="order-section-title">Shipping Address</h2>
             <address className="order-address">
-              <p>{order.address.line1}</p>
-
-              {order.address.line2 && (
-                <p>{order.address.line2}</p>
+              <p>{order.shippingAddressLine1}</p>
+              {order.shippingAddressLine2 && (
+                <p>{order.shippingAddressLine2}</p>
               )}
-
               <p>
-                {order.address.city},{" "}
-                {order.address.state}{" "}
-                {order.address.zip}
+                {order.shippingCity}, {order.shippingState}{" "}
+                {order.shippingPostalCode}
               </p>
-
-              <p>{order.address.country}</p>
+              <p>{order.shippingCountry}</p>
             </address>
           </Card>
         </div>
       </div>
 
-      {showUpdate && (
+      {showConfirm && selectedStatus && (
         <div className="order-modal">
           <div
             className="order-modal-backdrop"
-            onClick={() => setShowUpdate(false)}
+            onClick={() => {
+              setShowConfirm(false);
+              setSelectedStatus(null);
+            }}
           />
 
           <div className="order-status-modal">
-            <h3 className="order-modal-title">
-              Update Order Status
-            </h3>
+            <h3 className="order-modal-title">Update Order Status</h3>
 
-            <select
-              value={newStatus}
-              onChange={(e) =>
-                setNewStatus(e.target.value)
-              }
-              className="order-status-select"
-            >
-              {[
-                "Pending",
-                "Processing",
-                "Shipped",
-                "In Transit",
-                "Delivered",
-                "Cancelled",
-                "Returned",
-              ].map((s) => (
-                <option key={s} value={s}>
-                  {s}
-                </option>
-              ))}
-            </select>
+            <p>
+              Move this order from <strong>{formatStatus(order.status)}</strong>{" "}
+              to <strong>{formatStatus(selectedStatus)}</strong>?
+            </p>
 
             <div className="order-modal-actions">
               <Button
                 variant="secondary"
-                onClick={() =>
-                  setShowUpdate(false)
-                }
+                onClick={() => {
+                  setShowConfirm(false);
+                  setSelectedStatus(null);
+                }}
               >
                 Cancel
               </Button>
 
-              <Button onClick={updateStatus}>
-                Update Status
+              <Button loading={updating} onClick={handleAdvanceStatus}>
+                Confirm
               </Button>
             </div>
           </div>

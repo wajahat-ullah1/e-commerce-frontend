@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Trash2, Eye, Star } from "lucide-react";
 import {
   Card,
@@ -9,52 +9,60 @@ import {
   Modal,
   EmptyState,
 } from "../../components/admin_Ui/Ui";
-import { reviews as initialReviews } from "../../data/mockData";
+import { reviewService } from "../../services/reviewService";
+import { useApp } from "../../context/AppContext";
 import "./Reviews.css";
 
-export default function Reviews({ showToast }) {
-  const [reviews, setReviews] = useState(initialReviews);
+export default function Reviews() {
+  const { showToast } = useApp();
+
+  const [reviews, setReviews] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [ratingFilter, setRatingFilter] = useState(0);
   const [viewReview, setViewReview] = useState(null);
   const [deleteId, setDeleteId] = useState(null);
 
+  useEffect(() => {
+    reviewService
+      .list()
+      .then(setReviews)
+      .catch((err) => showToast("error", err.message))
+      .finally(() => setLoading(false));
+  }, []);
+
   // Filter reviews by selected rating
   const filtered = reviews.filter(
-    (r) =>
-      ratingFilter === 0 ||
-      r.rating === ratingFilter
+    (r) => ratingFilter === 0 || r.rating === ratingFilter,
   );
 
   // Delete a review
-  const handleDelete = (id) => {
-    setReviews((rs) =>
-      rs.filter((r) => r.id !== id)
-    );
-
-    setDeleteId(null);
-
-    showToast("Review deleted.", "success");
+  const handleDelete = async (id) => {
+    try {
+      await reviewService.remove(id);
+      setReviews((rs) => rs.filter((r) => r.id !== id));
+      setDeleteId(null);
+      showToast("success", "Review deleted.");
+    } catch (err) {
+      showToast("error", err.message);
+    }
   };
+
+  if (loading) return <div className="reviews-page">Loading reviews…</div>;
+
 
   return (
     <div className="reviews-page">
       {/* Page Header */}
       <div className="reviews-page-header">
-        <h1 className="reviews-title">
-          Reviews
-        </h1>
+        <h1 className="reviews-title">Reviews</h1>
 
-        <p className="reviews-subtitle">
-          {reviews.length} product reviews
-        </p>
+        <p className="reviews-subtitle">{reviews.length} product reviews</p>
       </div>
 
       {/* Rating Filter */}
       <Card className="reviews-filter-card">
         <div className="reviews-filter">
-          <span className="reviews-filter-label">
-            Filter by rating:
-          </span>
+          <span className="reviews-filter-label">Filter by rating:</span>
 
           <div className="reviews-rating-buttons">
             {/* All Reviews Button */}
@@ -75,9 +83,7 @@ export default function Reviews({ showToast }) {
               <button
                 key={r}
                 type="button"
-                onClick={() =>
-                  setRatingFilter(r)
-                }
+                onClick={() => setRatingFilter(r)}
                 className={`rating-filter-button rating-filter-star-button ${
                   ratingFilter === r
                     ? "rating-filter-star-active"
@@ -96,9 +102,7 @@ export default function Reviews({ showToast }) {
       <Card className="reviews-table-card">
         {filtered.length === 0 ? (
           <EmptyState
-            icon={
-              <Star className="reviews-empty-icon" />
-            }
+            icon={<Star className="reviews-empty-icon" />}
             title="No reviews found"
           />
         ) : (
@@ -117,9 +121,7 @@ export default function Reviews({ showToast }) {
                     <th
                       key={heading}
                       className={
-                        index === 5
-                          ? "reviews-th-right"
-                          : "reviews-th-left"
+                        index === 5 ? "reviews-th-right" : "reviews-th-left"
                       }
                     >
                       {heading}
@@ -133,15 +135,11 @@ export default function Reviews({ showToast }) {
                   <tr key={r.id}>
                     {/* Product */}
                     <td className="reviews-product-cell">
-                      <div className="reviews-product-name">
-                        {r.product}
-                      </div>
+                      <div className="reviews-product-name">{r.product?.name}</div>
                     </td>
 
                     {/* Customer */}
-                    <td className="reviews-customer-cell">
-                      {r.customer}
-                    </td>
+                    <td className="reviews-customer-cell">{r.user?.name}</td>
 
                     {/* Rating */}
                     <td className="reviews-rating-cell">
@@ -154,9 +152,7 @@ export default function Reviews({ showToast }) {
                     </td>
 
                     {/* Date */}
-                    <td className="reviews-date-cell">
-                      {r.date}
-                    </td>
+                    <td className="reviews-date-cell">{new Date(r.createdAt).toLocaleDateString("en-GB")}</td>
 
                     {/* Actions */}
                     <td className="reviews-actions-cell">
@@ -164,9 +160,7 @@ export default function Reviews({ showToast }) {
                         {/* View Review */}
                         <button
                           type="button"
-                          onClick={() =>
-                            setViewReview(r)
-                          }
+                          onClick={() => setViewReview(r)}
                           className="review-action-button"
                           aria-label="View review"
                         >
@@ -176,9 +170,7 @@ export default function Reviews({ showToast }) {
                         {/* Delete Review */}
                         <button
                           type="button"
-                          onClick={() =>
-                            setDeleteId(r.id)
-                          }
+                          onClick={() => setDeleteId(r.id)}
                           className="review-delete-button"
                           aria-label="Delete review"
                         >
@@ -196,45 +188,28 @@ export default function Reviews({ showToast }) {
 
       {/* Review Details Modal */}
       {viewReview && (
-        <Modal
-          title="Review Details"
-          onClose={() =>
-            setViewReview(null)
-          }
-        >
+        <Modal title="Review Details" onClose={() => setViewReview(null)}>
           <div className="review-details">
             {/* Customer and Rating */}
             <div className="review-details-header">
               <div>
-                <p className="review-details-customer">
-                  {viewReview.customer}
-                </p>
+                <p className="review-details-customer">{viewReview.user?.name}</p>
 
-                <p className="review-details-date">
-                  {viewReview.date}
-                </p>
+                <p className="review-details-date">{new Date(viewReview.createdAt).toLocaleDateString("en-GB")}</p>
               </div>
 
-              <Stars
-                rating={viewReview.rating}
-              />
+              <Stars rating={viewReview.rating} />
             </div>
 
             {/* Product Information */}
             <div className="review-product-box">
-              <p className="review-product-label">
-                Product
-              </p>
+              <p className="review-product-label">Product</p>
 
-              <p className="review-product-value">
-                {viewReview.product}
-              </p>
+              <p className="review-product-value">{viewReview.product?.name}</p>
             </div>
 
             {/* Review Comment */}
-            <p className="review-details-comment">
-              {viewReview.comment}
-            </p>
+            <p className="review-details-comment">{viewReview.comment}</p>
 
             {/* Modal Actions */}
             <div className="review-modal-actions">
@@ -242,9 +217,7 @@ export default function Reviews({ showToast }) {
                 variant="danger"
                 size="sm"
                 onClick={() => {
-                  setDeleteId(
-                    viewReview.id
-                  );
+                  setDeleteId(viewReview.id);
                   setViewReview(null);
                 }}
               >
@@ -254,9 +227,7 @@ export default function Reviews({ showToast }) {
               <Button
                 variant="secondary"
                 size="sm"
-                onClick={() =>
-                  setViewReview(null)
-                }
+                onClick={() => setViewReview(null)}
               >
                 Close
               </Button>
@@ -271,12 +242,8 @@ export default function Reviews({ showToast }) {
           title="Delete Review"
           message="Are you sure you want to delete this review? This action cannot be undone."
           confirmLabel="Delete Review"
-          onConfirm={() =>
-            handleDelete(deleteId)
-          }
-          onCancel={() =>
-            setDeleteId(null)
-          }
+          onConfirm={() => handleDelete(deleteId)}
+          onCancel={() => setDeleteId(null)}
         />
       )}
     </div>

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Upload, X, ImageIcon, ArrowLeft } from "lucide-react";
 import { Card, Button, Input } from "../../components/admin_Ui/Ui";
@@ -12,17 +12,19 @@ export default function AddProduct() {
   const { id } = useParams();
   const isEdit = Boolean(id);
   const { showToast } = useApp();
+  const fileInputRef = useRef(null);
   const [form, setForm] = useState({
     name: "",
     description: "",
     category: "",
     price: "",
     stock: "",
-    image: "",
   });
 
   const [categories, setCategories] = useState([]);
-  const [imageState, setImageState] = useState(isEdit ? "uploaded" : "empty");
+  const [imageFile, setImageFile] = useState(null);
+  const [imagePreview, setImagePreview] = useState("");
+  const [imageState, setImageState] = useState("empty");
   const [errors, setErrors] = useState({});
   const [saving, setSaving] = useState(false);
   const [showDelete, setShowDelete] = useState(false);
@@ -36,16 +38,28 @@ export default function AddProduct() {
         setForm({
           name: product.name || "",
           description: product.description || "",
-          category: product.category || "",
+          category: product.category?.id || product.category || "",
           price: String(product.price ?? ""),
           stock: String(product.stock ?? ""),
-          image: product.image || "",
         });
-        if (product.image) setImageState("uploaded");
+        if (product.image) {
+          setImagePreview(product.image);
+          setImageState("uploaded");
+        }
       })
       .catch((err) => showToast("error", err.message))
       .finally(() => setLoadingProduct(false));
   }, [id, isEdit]);
+
+  useEffect(() => {
+    categoryService
+      .list()
+      .then(setCategories)
+      .catch((err) => {
+        showToast("error", "Failed to load categories: " + err.message);
+        setCategories([]);
+      });
+  }, []);
 
   const validate = () => {
     const e = {};
@@ -75,19 +89,21 @@ export default function AddProduct() {
     if (!validate()) return;
     setSaving(true);
     try {
-      const payload = {
-        name: form.name,
-        description: form.description,
-        category: form.category,
-        price: Number(form.price),
-        stock: Number(form.stock),
-        image: form.image,
-      };
+      const formData = new FormData();
+      formData.append("name", form.name);
+      formData.append("description", form.description);
+      formData.append("categoryId", form.category);
+      formData.append("price", form.price);
+      formData.append("stock", form.stock);
+      if (imageFile) {
+        formData.append("image", imageFile);
+      }
+
       if (isEdit) {
-        await productService.update(id, payload);
+        await productService.update(id, formData);
         showToast("success", "Product updated successfully.");
       } else {
-        await productService.create(payload);
+        await productService.create(formData);
         showToast("success", "Product created successfully.");
       }
       navigate("/admin/products");
@@ -98,15 +114,15 @@ export default function AddProduct() {
     }
   };
 
-  const handleUpload = () => {
-    setImageState("uploading");
-    setTimeout(() => {
-      updateForm(
-        "image",
-        "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=300&h=240&fit=crop&auto=format",
-      );
-      setImageState("uploaded");
-    }, 1200);
+  const handleUploadClick = () => fileInputRef.current?.click();
+
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    setImageFile(file);
+    setImagePreview(URL.createObjectURL(file));
+    setImageState("uploaded");
+    e.target.value = "";
   };
 
   const updateForm = (field, value) =>
@@ -117,32 +133,26 @@ export default function AddProduct() {
 
   return (
     <div className="add-product-page">
-      {/* Header */}
       <div className="add-product-header">
         <button
-          onClick={() => onNavigate("products")}
+          onClick={() => navigate("/admin/products")}
           className="add-product-back-button"
         >
           <ArrowLeft className="add-product-back-icon" />
         </button>
-
         <div>
           <h1 className="add-product-title">
             {isEdit ? "Edit Product" : "Add Product"}
           </h1>
-
           <p className="add-product-subtitle">
             {isEdit ? "Update product details" : "Create a new product listing"}
           </p>
         </div>
       </div>
 
-      {/* Main Content */}
       <div className="add-product-grid">
-        {/* Form */}
         <Card className="add-product-form-card">
           <h2 className="add-product-section-title">Product Information</h2>
-
           <Input
             label="Product Name"
             placeholder="e.g. Premium Wireless Headphones"
@@ -151,10 +161,8 @@ export default function AddProduct() {
             error={errors.name}
           />
 
-          {/* Description */}
           <div className="add-product-field">
             <label className="add-product-label">Description</label>
-
             <textarea
               rows={4}
               placeholder="Describe the product…"
@@ -164,39 +172,25 @@ export default function AddProduct() {
             />
           </div>
 
-          {/* Category */}
           <div className="add-product-field">
             <label className="add-product-label">Category</label>
-
             <select
               value={form.category}
               onChange={(e) => updateForm("category", e.target.value)}
-              className={`add-product-select ${
-                errors.category ? "add-product-select-error" : ""
-              }`}
+              className={`add-product-select ${errors.category ? "add-product-select-error" : ""}`}
             >
               <option value="">Select category</option>
-
-              {[
-                "Electronics",
-                "Accessories",
-                "Bags",
-                "Footwear",
-                "Kitchen",
-                "Apparel",
-              ].map((category) => (
-                <option key={category} value={category}>
-                  {category}
+              {categories.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.name}
                 </option>
               ))}
             </select>
-
             {errors.category && (
               <p className="add-product-error">{errors.category}</p>
             )}
           </div>
 
-          {/* Price + Stock */}
           <div className="add-product-two-columns">
             <Input
               label="Price ($)"
@@ -206,7 +200,6 @@ export default function AddProduct() {
               onChange={(e) => updateForm("price", e.target.value)}
               error={errors.price}
             />
-
             <Input
               label="Stock Quantity"
               type="number"
@@ -218,34 +211,35 @@ export default function AddProduct() {
           </div>
         </Card>
 
-        {/* Product Image */}
         <Card className="add-product-image-card">
           <h2 className="add-product-section-title add-product-image-title">
             Product Image
           </h2>
 
-          {/* Empty */}
+          <input
+            type="file"
+            accept="image/*"
+            ref={fileInputRef}
+            onChange={handleFileChange}
+            style={{ display: "none" }}
+          />
+
           {imageState === "empty" && (
-            <div onClick={handleUpload} className="add-product-upload-box">
+            <div onClick={handleUploadClick} className="add-product-upload-box">
               <div className="add-product-upload-icon">
                 <Upload />
               </div>
-
               <div>
                 <p className="add-product-upload-title">Drop image here</p>
-
                 <p className="add-product-upload-description">
                   PNG, JPG, WEBP up to 5MB
                 </p>
               </div>
-
               <Button variant="secondary" size="sm">
                 Browse Files
               </Button>
             </div>
           )}
-
-          {/* Uploading */}
           {imageState === "uploading" && (
             <div className="add-product-upload-box add-product-uploading">
               <svg
@@ -261,56 +255,50 @@ export default function AddProduct() {
                   stroke="currentColor"
                   strokeWidth="3"
                 />
-
                 <path
                   className="add-product-spinner-path"
                   fill="currentColor"
                   d="M4 12a8 8 0 018-8v8H4z"
                 />
               </svg>
-
               <p className="add-product-uploading-text">Uploading image…</p>
             </div>
           )}
-
-          {/* Uploaded */}
           {imageState === "uploaded" && (
             <div className="add-product-image-preview">
               <div className="add-product-image-wrapper">
                 <img
-                  src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=300&h=240&fit=crop&auto=format"
+                  src={imagePreview}
                   alt="Product"
                   className="add-product-image"
                 />
-
                 <button
-                  onClick={() => setImageState("empty")}
+                  onClick={() => {
+                    setImageState("empty");
+                    setImageFile(null);
+                    setImagePreview("");
+                  }}
                   className="add-product-remove-image"
                 >
                   <X />
                 </button>
               </div>
-
               <div className="add-product-image-actions">
                 <Button
                   variant="secondary"
                   size="sm"
                   className="add-product-replace-button"
-                  onClick={handleUpload}
+                  onClick={handleUploadClick}
                 >
                   Replace
                 </Button>
               </div>
             </div>
           )}
-
-          {/* Error */}
           {imageState === "error" && (
             <div className="add-product-upload-error">
               <ImageIcon className="add-product-error-image-icon" />
-
               <p className="add-product-upload-error-title">Upload failed</p>
-
               <Button variant="outline" size="sm" onClick={handleUpload}>
                 Try again
               </Button>
@@ -319,7 +307,6 @@ export default function AddProduct() {
         </Card>
       </div>
 
-      {/* Actions */}
       <div className="add-product-actions">
         {isEdit ? (
           <Button variant="danger" onClick={() => setShowDelete(true)}>
@@ -328,45 +315,46 @@ export default function AddProduct() {
         ) : (
           <div />
         )}
-
         <div className="add-product-action-buttons">
-          <Button variant="secondary" onClick={() => onNavigate("products")}>
+          <Button
+            variant="secondary"
+            onClick={() => navigate("/admin/products")}
+          >
             Cancel
           </Button>
-
           <Button loading={saving} onClick={handleSave}>
             {isEdit ? "Save Changes" : "Save Product"}
           </Button>
         </div>
       </div>
 
-      {/* Delete Modal */}
       {showDelete && (
         <div className="add-product-modal">
           <div
             className="add-product-modal-backdrop"
             onClick={() => setShowDelete(false)}
           />
-
           <div className="add-product-delete-modal">
             <h3 className="add-product-delete-title">Delete Product</h3>
-
             <p className="add-product-delete-description">
               Are you sure you want to delete this product? This action cannot
               be undone and will remove all associated data.
             </p>
-
             <div className="add-product-delete-actions">
               <Button variant="secondary" onClick={() => setShowDelete(false)}>
                 Cancel
               </Button>
-
               <Button
                 variant="danger"
-                onClick={() => {
+                onClick={async () => {
+                  try {
+                    await productService.remove(id);
+                    showToast("success", "Product deleted.");
+                    navigate("/admin/products");
+                  } catch (err) {
+                    showToast("error", err.message);
+                  }
                   setShowDelete(false);
-                  showToast("Product deleted.", "success");
-                  onNavigate("products");
                 }}
               >
                 Delete Product

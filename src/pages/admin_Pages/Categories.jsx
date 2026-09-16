@@ -77,14 +77,11 @@ export default function Categories() {
 
   return (
     <div className="categories-page">
-      {/* Header */}
       <div className="categories-header">
         <div>
           <h1 className="categories-title">Categories</h1>
-
           <p className="categories-subtitle">{cats.length} categories</p>
         </div>
-
         <Button
           onClick={() => {
             setNewName("");
@@ -96,7 +93,6 @@ export default function Categories() {
         </Button>
       </div>
 
-      {/* Categories Table */}
       <Card className="categories-card">
         {cats.length === 0 ? (
           <EmptyState
@@ -117,15 +113,11 @@ export default function Categories() {
                   <th className="categories-th categories-th-left">
                     Category Name
                   </th>
-
                   <th className="categories-th categories-th-left">Products</th>
-
                   <th className="categories-th categories-th-left">Created</th>
-
                   <th className="categories-th categories-th-right">Actions</th>
                 </tr>
               </thead>
-
               <tbody>
                 {cats.map((cat) => (
                   <tr key={cat.id} className="categories-table-row">
@@ -134,19 +126,17 @@ export default function Categories() {
                         <div className="categories-tag-icon">
                           <Tag />
                         </div>
-
                         <span className="categories-name">{cat.name}</span>
                       </div>
                     </td>
-
                     <td className="categories-td categories-products">
-                      {cat.products} products
+                      {cat._count?.products ?? 0} products
                     </td>
-
                     <td className="categories-td categories-created">
-                      {cat.created}
+                      {cat.createdAt
+                        ? new Date(cat.createdAt).toLocaleDateString("en-GB")
+                        : "—"}
                     </td>
-
                     <td className="categories-td categories-actions-cell">
                       <div className="categories-actions">
                         <button
@@ -159,7 +149,6 @@ export default function Categories() {
                         >
                           <Edit3 />
                         </button>
-
                         <button
                           onClick={() => setDeleteCat(cat)}
                           className="categories-action-button categories-delete-button"
@@ -177,7 +166,6 @@ export default function Categories() {
         )}
       </Card>
 
-      {/* Add / Edit Modal */}
       {(showAdd || editCat) && (
         <Modal
           title={editCat ? "Edit Category" : "Add Category"}
@@ -190,13 +178,11 @@ export default function Categories() {
               value={newName}
               onChange={(e) => setNewName(e.target.value)}
             />
-
             <div className="categories-modal-actions">
               <Button variant="secondary" onClick={closeModal}>
                 Cancel
               </Button>
-
-              <Button onClick={handleSave}>
+              <Button loading={saving} onClick={handleSave}>
                 {editCat ? "Save Changes" : "Create Category"}
               </Button>
             </div>
@@ -204,7 +190,6 @@ export default function Categories() {
         </Modal>
       )}
 
-      {/* Delete Confirmation */}
       {deleteCat && (
         <ConfirmDialog
           title="Delete Category"

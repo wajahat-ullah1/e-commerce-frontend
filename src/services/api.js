@@ -9,15 +9,16 @@ async function request(
   { method = "GET", body, headers = {}, auth = true } = {},
 ) {
   const token = localStorage.getItem("token");
+  const isFormData = body instanceof FormData;
 
   const res = await fetch(`${BASE_URL}${path}`, {
     method,
     headers: {
-      "Content-Type": "application/json",
+      ...(isFormData ? {} : { "Content-Type": "application/json" }),
       ...(auth && token ? { Authorization: `Bearer ${token}` } : {}),
       ...headers,
     },
-    body: body ? JSON.stringify(body) : undefined,
+    body: isFormData ? body : body ? JSON.stringify(body) : undefined,
   });
 
   if (res.status === 401) {
@@ -67,4 +68,13 @@ export const api = {
       ...opts,
       method: "DELETE",
     }),
+  getBlob: async (path, opts) => {
+    const token = localStorage.getItem("token");
+    const res = await fetch(`${BASE_URL}${path}`, {
+      headers: { Authorization: `Bearer ${token}` },
+      ...opts,
+    });
+    if (!res.ok) throw new Error(`Download failed (${res.status})`);
+    return res.blob();
+  },
 };
