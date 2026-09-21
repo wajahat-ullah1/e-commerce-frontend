@@ -99,6 +99,14 @@ export function AppProvider({ children }) {
     localStorage.removeItem("token");
   }, []);
 
+  //__ Profile __________________________________________________________________
+  const updateUser = useCallback((updates) => {
+    setUser((prev) => {
+      const merged = { ...prev, ...updates };
+      localStorage.setItem("user", JSON.stringify(merged));
+      return merged;
+    });
+  }, []);
   // ── Cart ────────────────────────────────────────────────────────────────────
   const addToCart = useCallback(
     (product, qty = 1) => {
@@ -193,6 +201,7 @@ export function AppProvider({ children }) {
         register,
         login,
         logout,
+        updateUser,
         cart,
         cartCount,
         cartTotal,

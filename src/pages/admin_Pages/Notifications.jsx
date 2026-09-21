@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Bell,
   ShoppingCart,
@@ -9,7 +9,10 @@ import {
   CheckCheck,
 } from "lucide-react";
 import { Card, Button } from "../../components/admin_Ui/Ui";
-import { notifications as initialNotifs } from "../../data/mockData";
+import { notificationService } from "../../services/notificationService";
+import { useApp } from "../../context/AppContext";
+import { useFetch } from "../../hooks/useFetch";
+// import { notifications as initialNotifs } from "../../data/mockData";
 import "./Notifications.css";
 
 const iconMap = {
@@ -26,63 +29,66 @@ const colorMap = {
   customer: "notification-icon-emerald",
 };
 
-export default function Notifications({
-  onMarkAllRead,
-  showToast,
-}) {
-  const [notifs, setNotifs] = useState(initialNotifs);
+export default function Notifications() {
+  const { showToast } = useApp();
 
-  const markRead = (id) => {
-    setNotifs((ns) =>
-      ns.map((n) =>
-        n.id === id
-          ? { ...n, read: true }
-          : n
-      )
-    );
+  const {
+    data: notifs,
+    loading,
+    error,
+    refetch,
+  } = useFetch(() => notificationService.list(), []);
+  const [markingAll, setMarkingAll] = useState(false);
+
+  useEffect(() => {
+    if (error) showToast("error", error);
+  }, [error]);
+
+  const markRead = async (id) => {
+    try {
+      await notificationService.markRead(id);
+      refetch();
+    } catch (err) {
+      showToast("error", err.message);
+    }
   };
 
-  const markAll = () => {
-    setNotifs((ns) =>
-      ns.map((n) => ({
-        ...n,
-        read: true,
-      }))
-    );
-
-    onMarkAllRead();
-
-    showToast(
-      "All notifications marked as read.",
-      "success"
-    );
+  const markAll = async () => {
+    const unreadIds = (notifs || []).filter((n) => !n.isRead).map((n) => n.id);
+    if (unreadIds.length === 0) return;
+    setMarkingAll(true);
+    try {
+      await Promise.all(
+        unreadIds.map((id) => notificationService.markRead(id)),
+      );
+      refetch();
+      showToast("success", "All notifications marked as read.");
+    } catch (err) {
+      showToast("error", err.message);
+    } finally {
+      setMarkingAll(false);
+    }
   };
 
-  const unread = notifs.filter(
-    (n) => !n.read
-  ).length;
+  const unread = (notifs || []).filter((n) => !n.isRead).length;
 
+    console.log("sample notif:", notifs?.[0]);
+
+  if (loading)
+    return <div className="notifications-page">Loading notifications…</div>;
   return (
     <div className="notifications-page">
       <div className="notifications-page-header">
         <div>
-          <h1 className="notifications-title">
-            Notifications
-          </h1>
+          <h1 className="notifications-title">Notifications</h1>
 
           <p className="notifications-subtitle">
-            {unread > 0
-              ? `${unread} unread`
-              : "All caught up"}
+            {unread > 0 ? `${unread} unread` : "All caught up"}
           </p>
         </div>
 
         {unread > 0 && (
-          <Button
-            variant="secondary"
-            size="sm"
-            onClick={markAll}
-          >
+          <Button variant="secondary" size="sm" onClick={markAll}>
             <CheckCheck className="notifications-button-icon" />
             Mark all as read
           </Button>
@@ -96,24 +102,19 @@ export default function Notifications({
               <Bell />
             </div>
 
-            <p className="notifications-empty-title">
-              No notifications
-            </p>
+            <p className="notifications-empty-title">No notifications</p>
           </div>
         ) : (
           notifs.map((n) => (
             <div
               key={n.id}
               className={`notification-item ${
-                !n.read
-                  ? "notification-unread"
-                  : "notification-read"
+                !n.isRead ? "notification-unread" : "notification-read"
               }`}
             >
               <div
                 className={`notification-type-icon ${
-                  colorMap[n.type] ||
-                  "notification-icon-default"
+                  colorMap[n.type] || "notification-icon-default"
                 }`}
               >
                 {iconMap[n.type] || <Bell />}
@@ -124,7 +125,7 @@ export default function Notifications({
                   <div className="notification-text">
                     <p
                       className={`notification-title-text ${
-                        !n.read
+                        !n.isRead
                           ? "notification-title-unread"
                           : "notification-title-read"
                       }`}
@@ -132,24 +133,18 @@ export default function Notifications({
                       {n.title}
                     </p>
 
-                    <p className="notification-message">
-                      {n.message}
-                    </p>
+                    <p className="notification-message">{n.message}</p>
 
-                    <p className="notification-time">
-                      {n.time}
-                    </p>
+                    <p className="notification-time">{n.time}</p>
                   </div>
 
-                  {!n.read && (
+                  {!n.isRead && (
                     <div className="notification-read-actions">
                       <div className="notification-unread-dot" />
 
                       <button
                         type="button"
-                        onClick={() =>
-                          markRead(n.id)
-                        }
+                        onClick={() => markRead(n.id)}
                         className="notification-read-button"
                       >
                         <Check />
