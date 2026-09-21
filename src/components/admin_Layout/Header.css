@@ -1,5 +1,5 @@
 .admin-header {
-  height: 56px;
+  height: 73px;
   flex-shrink: 0;
   display: flex;
   align-items: center;
@@ -171,17 +171,20 @@
   background: #f3f4f6;
 }
 
-.profile-avatar {
-  width: 28px;
-  height: 28px;
+.header-profile-avatar {
+  width: 67px;
+  height: 67px;
   display: flex;
   align-items: center;
-  justify-content: center;
   border-radius: 50%;
+  justify-content: center;
   background: #e0e7ff;
-  color: #4338ca;
-  font-size: 12px;
-  font-weight: 600;
+}
+
+.header-profile-avatar-image{
+  border-radius: 50%;
+  width: 67px;
+  height: 67px;
 }
 
 .profile-name {

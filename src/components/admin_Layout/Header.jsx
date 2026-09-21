@@ -1,5 +1,13 @@
 import { useState } from "react";
-import { Menu, Search, Bell, ChevronDown, User, Lock, LogOut } from "lucide-react";
+import {
+  Menu,
+  Bell,
+  ChevronDown,
+  User,
+  Lock,
+  LogOut,
+} from "lucide-react";
+import { useApp } from "../../context/AppContext";
 import "./Header.css";
 
 const breadcrumbs = {
@@ -29,8 +37,8 @@ export default function Header({
   unreadCount,
   onLogout,
 }) {
+  const { user } = useApp();
   const [profileOpen, setProfileOpen] = useState(false);
-  const [searchFocused, setSearchFocused] = useState(false);
   const crumbs = breadcrumbs[page] ?? [page];
 
   return (
@@ -43,7 +51,13 @@ export default function Header({
         {crumbs.map((crumb, i) => (
           <span key={i} className="breadcrumb-item">
             {i > 0 && <span className="breadcrumb-separator">/</span>}
-            <span className={i === crumbs.length - 1 ? "breadcrumb-current" : "breadcrumb-parent"}>
+            <span
+              className={
+                i === crumbs.length - 1
+                  ? "breadcrumb-current"
+                  : "breadcrumb-parent"
+              }
+            >
               {crumb}
             </span>
           </span>
@@ -51,17 +65,6 @@ export default function Header({
       </div>
 
       <div className="header-spacer" />
-
-      <div className={`header-search ${searchFocused ? "search-focused" : "search-default"}`}>
-        <Search className="search-icon" />
-        <input
-          type="text"
-          placeholder="Search..."
-          onFocus={() => setSearchFocused(true)}
-          onBlur={() => setSearchFocused(false)}
-          className="search-input"
-        />
-      </div>
 
       <button
         onClick={() => onNavigate("notifications")}
@@ -78,8 +81,20 @@ export default function Header({
           onClick={() => setProfileOpen((o) => !o)}
           className="profile-button"
         >
-          <div className="profile-avatar">AR</div>
-          <span className="profile-name">Admin</span>
+          <div className="header-profile-avatar">
+            {user?.profileImage ? (
+              <img
+                src={user.profileImage}
+                alt={user.name}
+                className="header-profile-avatar-image"
+              />
+            ) : (
+              user?.name?.charAt(0).toUpperCase() || "A"
+            )}
+          </div>
+          <span className="profile-name">
+            {user?.name?.split(" ")[0] || "Admin"}
+          </span>
           <ChevronDown className="profile-chevron" />
         </button>
 
@@ -114,7 +129,10 @@ export default function Header({
 
               <div className="dropdown-divider" />
 
-              <button onClick={onLogout} className="dropdown-button logout-button">
+              <button
+                onClick={onLogout}
+                className="dropdown-button logout-button"
+              >
                 <LogOut className="dropdown-icon" />
                 Logout
               </button>

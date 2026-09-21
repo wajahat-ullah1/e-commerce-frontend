@@ -15,6 +15,7 @@ import {
   Boxes,
 } from "lucide-react";
 import { useState } from "react";
+import { useApp } from "../../context/AppContext";
 import "./Sidebar.css";
 
 const navItems = [
@@ -84,6 +85,7 @@ export default function Sidebar({
   onMobileClose,
   unreadCount,
 }) {
+  const { user } = useApp();
   const [expanded, setExpanded] = useState({
     Products: true,
     Orders: true,
@@ -100,29 +102,21 @@ export default function Sidebar({
   const isActive = (item) => {
     if (item.page) return currentPage === item.page;
 
-    return item.children?.some(
-      (child) => child.page === currentPage
-    );
+    return item.children?.some((child) => child.page === currentPage);
   };
 
   const sidebarContent = (
     <div className="sidebar-content">
-
       {/* Logo */}
       <div className="sidebar-logo">
         <div className="sidebar-logo-icon">
           <Boxes className="sidebar-logo-boxes" />
         </div>
 
-        <span className="sidebar-logo-text">
-          ShopAdmin
-        </span>
+        <span className="sidebar-logo-text">ShopAdmin</span>
 
         {mobileOpen && (
-          <button
-            onClick={onMobileClose}
-            className="sidebar-close-button"
-          >
+          <button onClick={onMobileClose} className="sidebar-close-button">
             <X className="sidebar-close-icon" />
           </button>
         )}
@@ -136,7 +130,6 @@ export default function Sidebar({
           if (item.children) {
             return (
               <div key={item.label} className="sidebar-nav-group">
-
                 <button
                   onClick={() => toggle(item.label)}
                   className={`sidebar-nav-button ${
@@ -147,9 +140,7 @@ export default function Sidebar({
                 >
                   {item.icon}
 
-                  <span className="sidebar-nav-label">
-                    {item.label}
-                  </span>
+                  <span className="sidebar-nav-label">{item.label}</span>
 
                   {expanded[item.label] ? (
                     <ChevronDown className="sidebar-chevron" />
@@ -197,9 +188,7 @@ export default function Sidebar({
             >
               {item.icon}
 
-              <span className="sidebar-nav-label">
-                {item.label}
-              </span>
+              <span className="sidebar-nav-label">{item.label}</span>
 
               {item.page === "notifications" && unreadCount > 0 && (
                 <span className="sidebar-notification-badge">
@@ -213,27 +202,26 @@ export default function Sidebar({
 
       {/* Bottom: user + logout */}
       <div className="sidebar-bottom">
-
         <div className="sidebar-user">
           <div className="sidebar-user-avatar">
-            AR
+            {user?.profileImage ? (
+              <img
+                src={user.profileImage}
+                alt={user.name}
+                className="sidebar-user-avatar-image"
+              />
+            ) : (
+              user?.name?.charAt(0).toUpperCase() || "A"
+            )}
           </div>
 
           <div className="sidebar-user-info">
-            <div className="sidebar-user-name">
-              Admin Rivera
-            </div>
-
-            <div className="sidebar-user-email">
-              admin@shopadmin.com
-            </div>
+            <div className="sidebar-user-name">{user?.name}</div>
+            <div className="sidebar-user-email">{user?.email}</div>
           </div>
         </div>
 
-        <button
-          onClick={onLogout}
-          className="sidebar-logout-button"
-        >
+        <button onClick={onLogout} className="sidebar-logout-button">
           <LogOut className="sidebar-icon" />
           <span>Logout</span>
         </button>
@@ -244,22 +232,14 @@ export default function Sidebar({
   return (
     <>
       {/* Desktop sidebar */}
-      <aside className="sidebar-desktop">
-        {sidebarContent}
-      </aside>
+      <aside className="sidebar-desktop">{sidebarContent}</aside>
 
       {/* Mobile overlay */}
       {mobileOpen && (
         <div className="sidebar-mobile-overlay">
+          <div className="sidebar-mobile-backdrop" onClick={onMobileClose} />
 
-          <div
-            className="sidebar-mobile-backdrop"
-            onClick={onMobileClose}
-          />
-
-          <aside className="sidebar-mobile">
-            {sidebarContent}
-          </aside>
+          <aside className="sidebar-mobile">{sidebarContent}</aside>
         </div>
       )}
     </>

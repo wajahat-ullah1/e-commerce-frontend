@@ -209,8 +209,8 @@
 }
 
 .sidebar-user-avatar {
-  width: 32px;
-  height: 32px;
+  width: 40px;
+  height: 40px;
   flex-shrink: 0;
   display: flex;
   align-items: center;
@@ -220,6 +220,12 @@
   color: #4338ca;
   font-size: 14px;
   font-weight: 600;
+}
+
+.sidebar-user-avatar-image {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
 }
 
 .sidebar-user-info {

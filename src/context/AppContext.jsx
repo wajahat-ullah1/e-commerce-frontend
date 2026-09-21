@@ -7,6 +7,7 @@ import {
 } from "react";
 
 import { authService } from "../services/authService";
+import { profileService } from "../services/profileService";
 
 // ── Context ───────────────────────────────────────────────────────────────────
 
@@ -14,29 +15,29 @@ const AppContext = createContext(null);
 
 // ── Demo data ─────────────────────────────────────────────────────────────────
 
-const DEMO_ADDRESSES = [
-  {
-    id: "addr-1",
-    label: "Home",
-    line1: "123 Maple Street",
-    city: "San Francisco",
-    state: "CA",
-    postalCode: "94102",
-    country: "United States",
-    isDefault: true,
-  },
-  {
-    id: "addr-2",
-    label: "Office",
-    line1: "456 Market Street",
-    line2: "Suite 800",
-    city: "San Francisco",
-    state: "CA",
-    postalCode: "94105",
-    country: "United States",
-    isDefault: false,
-  },
-];
+// const DEMO_ADDRESSES = [
+//   {
+//     id: "addr-1",
+//     label: "Home",
+//     line1: "123 Maple Street",
+//     city: "San Francisco",
+//     state: "CA",
+//     postalCode: "94102",
+//     country: "United States",
+//     isDefault: true,
+//   },
+//   {
+//     id: "addr-2",
+//     label: "Office",
+//     line1: "456 Market Street",
+//     line2: "Suite 800",
+//     city: "San Francisco",
+//     state: "CA",
+//     postalCode: "94105",
+//     country: "United States",
+//     isDefault: false,
+//   },
+// ];
 
 // ── Provider ──────────────────────────────────────────────────────────────────
 
@@ -45,13 +46,29 @@ export function AppProvider({ children }) {
   const [loading, setLoading] = useState(true);
   const [cart, setCart] = useState([]);
   const [wishlist, setWishlist] = useState([]);
-  const [addresses, setAddresses] = useState(DEMO_ADDRESSES);
+  const [addresses, setAddresses] = useState();
   const [toasts, setToasts] = useState([]);
 
   // restore session on refresh
   useEffect(() => {
     const stored = localStorage.getItem("user");
-    if (stored) setUser(JSON.parse(stored));
+    if (stored) {
+      setUser(JSON.parse(stored));
+      profileService
+        .get()
+        .then((fullProfile) => {
+          setUser((prev) => {
+            const merged = {
+              ...prev,
+              ...fullProfile,
+              role: (fullProfile.role || prev?.role || "").toLowerCase(),
+            };
+            localStorage.setItem("user", JSON.stringify(merged));
+            return merged;
+          });
+        })
+        .catch(() => {}); // stale/invalid token will surface as a real 401 on the next actual request anyway
+    }
     setLoading(false);
   }, []);
 
@@ -84,8 +101,18 @@ export function AppProvider({ children }) {
 
   const login = useCallback(async (email, password) => {
     const { user, token } = await authService.login(email, password);
-    const normalizedUser = { ...user, role: user.role.toLowerCase() };
     localStorage.setItem("token", token);
+    const normalizedUser = { ...user, role: user.role.toLowerCase() };
+    try {
+      const fullProfile = await profileService.get();
+      normalizedUser = {
+        ...normalizedUser,
+        ...fullProfile,
+        role: normalizedUser.role,
+      };
+    } catch {
+      // profile fetch failing here shouldn't block login itself
+    }
     localStorage.setItem("user", JSON.stringify(normalizedUser));
     setUser(normalizedUser);
     return normalizedUser;
@@ -102,7 +129,11 @@ export function AppProvider({ children }) {
   //__ Profile __________________________________________________________________
   const updateUser = useCallback((updates) => {
     setUser((prev) => {
-      const merged = { ...prev, ...updates };
+      const merged = {
+        ...prev,
+        ...updates,
+        role: (updates.role || prev.role || "").toLowerCase(),
+      };
       localStorage.setItem("user", JSON.stringify(merged));
       return merged;
     });
