@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   DollarSign,
   ShoppingCart,
@@ -9,26 +9,35 @@ import {
   TrendingUp,
   Eye,
 } from "lucide-react";
+// import {
+//   AreaChart,
+//   Area,
+//   XAxis,
+//   YAxis,
+//   CartesianGrid,
+//   Tooltip,
+//   ResponsiveContainer,
+//   PieChart,
+//   Pie,
+//   Cell,
+// } from "recharts";
 import {
-  AreaChart,
-  Area,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  PieChart,
-  Pie,
-  Cell,
-} from "recharts";
-import { Card, StatCard, StatusBadge, Button, Stars } from "../../components/admin_Ui/Ui";
-import {
-  revenueData,
-  orderStatusData,
-  recentOrders,
-  products,
-  inventoryItems,
-} from "../../data/mockData";
+  Card,
+  StatCard,
+  StatusBadge,
+  Button,
+  Stars,
+} from "../../components/admin_Ui/Ui";
+import { getDashboardStats } from "../../services/dashboardService";
+import { notificationService } from "../../services/notificationService";
+import { useFetch } from "../../hooks/useFetch";
+
+const activityIcons = {
+  order: "🛍️",
+  stock: "⚠️",
+  review: "⭐",
+  customer: "👤",
+};
 import "./Dashboard.css";
 
 const ranges = ["Today", "Last 7 Days", "Last 30 Days", "This Year"];
@@ -83,7 +92,7 @@ const CustomTooltip = ({ active, payload, label }) => {
 
             <span className="dashboard-tooltip-value">
               {item.name === "revenue"
-                ? `$${item.value.toLocaleString()}`
+                ? `${item.value.toLocaleString()}`
                 : item.value}
             </span>
           </div>
@@ -97,6 +106,40 @@ const CustomTooltip = ({ active, payload, label }) => {
 
 export default function Dashboard({ onNavigate }) {
   const [range, setRange] = useState("Last 30 Days");
+
+  const [stats, setStats] = useState({
+    totalRevenue: 0,
+    totalOrders: 0,
+    totalCustomers: 0,
+    totalProducts: 0,
+    pendingOrders: 0,
+    lowStock: 0,
+  });
+  const [recentOrders, setRecentOrders] = useState([]);
+  const [lowStockProducts, setLowStockProducts] = useState([]);
+  const [topProducts, setTopProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const { data: notifs } = useFetch(() => notificationService.list(), []);
+
+  useEffect(() => {
+    const loadDashboard = async () => {
+      try {
+        const res = await getDashboardStats();
+        const data = res.data;
+
+        setStats(data);
+        setRecentOrders(data.recentOrders ?? []);
+        setLowStockProducts(data.lowStockProducts ?? []);
+        setTopProducts(data.topProducts ?? []);
+      } catch (error) {
+        console.error("Dashboard Stats Error:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadDashboard();
+  }, []);
 
   return (
     <div className="dashboard-page">
@@ -128,64 +171,46 @@ export default function Dashboard({ onNavigate }) {
       {/* Stat Cards */}
       <div className="dashboard-stat-grid">
         <StatCard
-          icon={<DollarSign className="dashboard-stat-icon" />}
+          icon={<span className="dashboard-stat-icon">₨</span>}
           label="Total Revenue"
-          value="$41,200"
-          change="12.5%"
-          changeLabel="vs last month"
-          trend="up"
+          value={stats.totalRevenue.toLocaleString()}
         />
 
         <StatCard
           icon={<ShoppingCart className="dashboard-stat-icon" />}
           label="Total Orders"
-          value="3,272"
-          change="8.3%"
-          changeLabel="vs last month"
-          trend="up"
+          value={stats.totalOrders.toLocaleString()}
         />
 
         <StatCard
           icon={<Users className="dashboard-stat-icon" />}
           label="Customers"
-          value="1,847"
-          change="5.1%"
-          changeLabel="vs last month"
-          trend="up"
+          value={stats.totalCustomers.toLocaleString()}
         />
 
         <StatCard
           icon={<Package className="dashboard-stat-icon" />}
           label="Products"
-          value="247"
-          change="3.2%"
-          changeLabel="vs last month"
-          trend="up"
+          value={stats.totalProducts.toLocaleString()}
         />
 
         <StatCard
           icon={<Clock className="dashboard-stat-icon" />}
           label="Pending Orders"
-          value="198"
-          change="2.4%"
-          changeLabel="vs last month"
-          trend="down"
+          value={stats.pendingOrders.toLocaleString()}
         />
 
         <StatCard
           icon={<AlertTriangle className="dashboard-stat-icon" />}
           label="Low Stock"
-          value="12"
-          change="4 new"
-          changeLabel="this week"
-          trend="down"
+          value={stats.lowStock.toLocaleString()}
         />
       </div>
 
       {/* Charts Row */}
-      <div className="dashboard-charts-grid">
-        {/* Revenue Chart */}
-        <Card className="dashboard-revenue-card">
+      {/* <div className="dashboard-charts-grid"> */}
+      {/* Revenue Chart */}
+      {/* <Card className="dashboard-revenue-card">
           <div className="dashboard-card-heading">
             <div>
               <h2 className="dashboard-section-title">Revenue & Orders</h2>
@@ -287,10 +312,10 @@ export default function Dashboard({ onNavigate }) {
               />
             </AreaChart>
           </ResponsiveContainer>
-        </Card>
+        </Card> */}
 
-        {/* Order Status */}
-        <Card className="dashboard-order-status-card">
+      {/* Order Status */}
+      {/* <Card className="dashboard-order-status-card">
           <h2 className="dashboard-section-title">Order Status</h2>
 
           <p className="dashboard-section-subtitle dashboard-order-subtitle">
@@ -350,8 +375,8 @@ export default function Dashboard({ onNavigate }) {
               );
             })}
           </div>
-        </Card>
-      </div>
+        </Card> */}
+      {/* </div> */}
 
       {/* Tables Row */}
       <div className="dashboard-tables-grid">
@@ -384,14 +409,14 @@ export default function Dashboard({ onNavigate }) {
               <tbody>
                 {recentOrders.map((order) => (
                   <tr key={order.id}>
-                    <td className="dashboard-order-id">{order.id}</td>
+                    <td className="dashboard-order-id">ORD-{order.id}</td>
 
                     <td className="dashboard-customer-name">
                       {order.customer}
                     </td>
 
                     <td className="dashboard-order-total">
-                      ${order.total.toFixed(2)}
+                      {order.total.toFixed(2)} PKR
                     </td>
 
                     <td>
@@ -434,31 +459,33 @@ export default function Dashboard({ onNavigate }) {
             </div>
 
             <div className="dashboard-low-stock-list">
-              {inventoryItems
-                .filter((item) => item.status !== "In Stock")
-                .map((item) => (
-                  <div key={item.id} className="dashboard-low-stock-item">
-                    <div className="dashboard-low-stock-info">
-                      <p className="dashboard-product-name">{item.name}</p>
+              {!loading && lowStockProducts.length === 0 && (
+                <p className="dashboard-product-id">No low stock items</p>
+              )}
 
-                      <p className="dashboard-product-id">{item.id}</p>
-                    </div>
-
-                    <div className="dashboard-stock-info">
-                      <p
-                        className={`dashboard-stock-number ${
-                          item.stock === 0
-                            ? "dashboard-stock-empty"
-                            : "dashboard-stock-low"
-                        }`}
-                      >
-                        {item.stock}
-                      </p>
-
-                      <StatusBadge status={item.status} />
-                    </div>
+              {lowStockProducts.map((item) => (
+                <div key={item.id} className="dashboard-low-stock-item">
+                  <div className="dashboard-low-stock-info">
+                    <p className="dashboard-product-name">{item.name}</p>
+                    <p className="dashboard-product-id">#{item.id}</p>
                   </div>
-                ))}
+
+                  <div className="dashboard-stock-info">
+                    <p
+                      className={`dashboard-stock-number ${
+                        item.stock === 0
+                          ? "dashboard-stock-empty"
+                          : "dashboard-stock-low"
+                      }`}
+                    >
+                      {item.stock}
+                    </p>
+                    <StatusBadge
+                      status={item.stock === 0 ? "Out of Stock" : "Low Stock"}
+                    />
+                  </div>
+                </div>
+              ))}
             </div>
           </Card>
 
@@ -472,14 +499,19 @@ export default function Dashboard({ onNavigate }) {
             </div>
 
             <div className="dashboard-activity-list">
-              {activity.map((item, index) => (
-                <div key={index} className="dashboard-activity-item">
-                  <span className="dashboard-activity-icon">{item.icon}</span>
+              {(notifs || []).length === 0 && (
+                <p className="dashboard-activity-time">No recent activity</p>
+              )}
+
+              {(notifs || []).slice(0, 6).map((n) => (
+                <div key={n.id} className="dashboard-activity-item">
+                  <span className="dashboard-activity-icon">
+                    {activityIcons[n.type] || "🔔"}
+                  </span>
 
                   <div className="dashboard-activity-content">
-                    <p className="dashboard-activity-text">{item.text}</p>
-
-                    <p className="dashboard-activity-time">{item.time}</p>
+                    <p className="dashboard-activity-text">{n.message}</p>
+                    <p className="dashboard-activity-time">{n.time}</p>
                   </div>
                 </div>
               ))}
@@ -515,38 +547,38 @@ export default function Dashboard({ onNavigate }) {
             </thead>
 
             <tbody>
-              {products.slice(0, 5).map((product) => (
+              {topProducts.length === 0 && !loading && (
+                <tr>
+                  <td colSpan={5}>No sales yet</td>
+                </tr>
+              )}
+
+              {topProducts.map((product) => (
                 <tr key={product.id}>
                   <td>
                     <div className="dashboard-product-cell">
-                      <img
-                        src={product.image}
-                        alt={product.name}
-                        className="dashboard-product-image"
-                      />
+                      {product.image && (
+                        <img
+                          src={product.image}
+                          alt={product.name}
+                          className="dashboard-product-image"
+                        />
+                      )}
 
                       <div>
                         <p className="dashboard-product-title">
                           {product.name}
                         </p>
-
-                        <div className="dashboard-product-rating">
-                          <Stars rating={Math.floor(product.rating)} />
-
-                          <span>({product.reviews})</span>
-                        </div>
                       </div>
                     </div>
                   </td>
 
                   <td className="dashboard-category">{product.category}</td>
 
-                  <td className="dashboard-number-cell">
-                    {(product.reviews * 1.2).toFixed(0)}
-                  </td>
+                  <td className="dashboard-number-cell">{product.unitsSold}</td>
 
                   <td className="dashboard-number-cell dashboard-revenue-cell">
-                    ${(product.price * product.reviews * 0.8).toFixed(0)}
+                    {product.revenue.toLocaleString()} PKR
                   </td>
 
                   <td className="dashboard-number-cell">

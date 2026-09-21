@@ -307,13 +307,13 @@ export function StatCard({ icon, label, value, change, changeLabel, trend }) {
       <div className="ui-stat-top">
         <div className="ui-stat-icon">{icon}</div>
 
-        <span
+        {/* <span
           className={`ui-stat-change ${
             trend === "up" ? "ui-stat-change-up" : "ui-stat-change-down"
           }`}
         >
           {trend === "up" ? "↑" : "↓"} {change}
-        </span>
+        </span> */}
       </div>
 
       <div className="ui-stat-value">{value}</div>
