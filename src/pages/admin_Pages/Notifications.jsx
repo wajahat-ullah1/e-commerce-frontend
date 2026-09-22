@@ -7,10 +7,11 @@ import {
   Users,
   Check,
   CheckCheck,
+  Trash2,
 } from "lucide-react";
 import { Card, Button } from "../../components/admin_Ui/Ui";
 import { notificationService } from "../../services/notificationService";
-import { useApp } from "../../context/AppContext";
+import { useApp } from "../../context/useApp";
 import { useFetch } from "../../hooks/useFetch";
 // import { notifications as initialNotifs } from "../../data/mockData";
 import "./Notifications.css";
@@ -30,7 +31,7 @@ const colorMap = {
 };
 
 export default function Notifications() {
-  const { showToast } = useApp();
+  const { showToast, refreshUnreadCount } = useApp();
 
   const {
     data: notifs,
@@ -48,6 +49,7 @@ export default function Notifications() {
     try {
       await notificationService.markRead(id);
       refetch();
+      refreshUnreadCount();
     } catch (err) {
       showToast("error", err.message);
     }
@@ -62,6 +64,7 @@ export default function Notifications() {
         unreadIds.map((id) => notificationService.markRead(id)),
       );
       refetch();
+      refreshUnreadCount();
       showToast("success", "All notifications marked as read.");
     } catch (err) {
       showToast("error", err.message);
@@ -72,7 +75,28 @@ export default function Notifications() {
 
   const unread = (notifs || []).filter((n) => !n.isRead).length;
 
-    console.log("sample notif:", notifs?.[0]);
+  console.log("sample notif:", notifs?.[0]);
+
+  const handleDelete = async (id) => {
+    try {
+      await notificationService.remove(id);
+      refetch();
+      refreshUnreadCount();
+    } catch (err) {
+      showToast("error", err.message);
+    }
+  };
+
+  const handleClearAll = async () => {
+    try {
+      await notificationService.clearAll();
+      refetch();
+      refreshUnreadCount();
+      showToast("success", "All notifications cleared.");
+    } catch (err) {
+      showToast("error", err.message);
+    }
+  };
 
   if (loading)
     return <div className="notifications-page">Loading notifications…</div>;
@@ -91,6 +115,11 @@ export default function Notifications() {
           <Button variant="secondary" size="sm" onClick={markAll}>
             <CheckCheck className="notifications-button-icon" />
             Mark all as read
+          </Button>
+        )}
+        {(notifs || []).length > 0 && (
+          <Button variant="secondary" size="sm" onClick={handleClearAll}>
+            Clear all
           </Button>
         )}
       </div>
@@ -149,6 +178,14 @@ export default function Notifications() {
                       >
                         <Check />
                         Read
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleDelete(n.id)}
+                        className="notification-delete-button"
+                        aria-label="Delete notification"
+                      >
+                        <Trash2 />
                       </button>
                     </div>
                   )}

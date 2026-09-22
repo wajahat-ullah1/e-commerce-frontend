@@ -7,7 +7,7 @@ import {
   Lock,
   LogOut,
 } from "lucide-react";
-import { useApp } from "../../context/AppContext";
+import { useApp } from "../../context/useApp";
 import "./Header.css";
 
 const breadcrumbs = {

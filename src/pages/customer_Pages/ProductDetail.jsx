@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { products, reviews } from '../../data/products';
-import { useApp } from '../../context/AppContext';
+import { useApp } from '../../context/useApp';
 import Breadcrumb from '../../components/customer_Ui/Breadcrumb';
 import Rating, { StarSelector } from '../../components/customer_Ui/Rating';
 import { StockBadge } from '../../components/customer_Ui/Badge';

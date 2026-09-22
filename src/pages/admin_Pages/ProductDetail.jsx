@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, Edit3 } from "lucide-react";
 import { Card, Button, StatusBadge, Stars } from "../../components/admin_Ui/Ui";
 import { productService } from "../../services/productService";
-import { useApp } from "../../context/AppContext";
+import { useApp } from "../../context/useApp";
 import "./ProductDetail.css";
 
 export default function ProductDetail() {

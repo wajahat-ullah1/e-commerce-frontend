@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useApp } from '../../context/AppContext';
+import { useApp } from '../../context/useApp';
 import Modal from '../../components/customer_Ui/Modal';
 import './Addresses.css';
 

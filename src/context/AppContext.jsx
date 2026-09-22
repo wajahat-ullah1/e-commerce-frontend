@@ -8,36 +8,11 @@ import {
 
 import { authService } from "../services/authService";
 import { profileService } from "../services/profileService";
+import { notificationService } from "../services/notificationService";
 
 // ── Context ───────────────────────────────────────────────────────────────────
 
-const AppContext = createContext(null);
-
-// ── Demo data ─────────────────────────────────────────────────────────────────
-
-// const DEMO_ADDRESSES = [
-//   {
-//     id: "addr-1",
-//     label: "Home",
-//     line1: "123 Maple Street",
-//     city: "San Francisco",
-//     state: "CA",
-//     postalCode: "94102",
-//     country: "United States",
-//     isDefault: true,
-//   },
-//   {
-//     id: "addr-2",
-//     label: "Office",
-//     line1: "456 Market Street",
-//     line2: "Suite 800",
-//     city: "San Francisco",
-//     state: "CA",
-//     postalCode: "94105",
-//     country: "United States",
-//     isDefault: false,
-//   },
-// ];
+export const AppContext = createContext(null);
 
 // ── Provider ──────────────────────────────────────────────────────────────────
 
@@ -46,8 +21,9 @@ export function AppProvider({ children }) {
   const [loading, setLoading] = useState(true);
   const [cart, setCart] = useState([]);
   const [wishlist, setWishlist] = useState([]);
-  const [addresses, setAddresses] = useState();
+  const [addresses, setAddresses] = useState([]);
   const [toasts, setToasts] = useState([]);
+  const [unreadCount, setUnreadCount] = useState(0);
 
   // restore session on refresh
   useEffect(() => {
@@ -71,6 +47,37 @@ export function AppProvider({ children }) {
     }
     setLoading(false);
   }, []);
+
+  const refreshUnreadCount = useCallback(async () => {
+    if (!user) return;
+    try {
+      const count = await notificationService.unreadCount();
+      setUnreadCount(count);
+    } catch {
+      // non-critical — don't disrupt the UI over a badge count failing
+    }
+  }, [user]);
+
+  useEffect(() => {
+    refreshUnreadCount();
+
+    if (!user) return;
+
+    const token = localStorage.getItem("token");
+    const eventSource = new EventSource(
+      `${import.meta.env.VITE_API_BASE_URL}/notifications/stream?token=${token}`,
+    );
+
+    eventSource.onmessage = () => {
+      refreshUnreadCount();
+    };
+
+    eventSource.onerror = () => {
+      // browser auto-reconnects EventSource on its own; nothing to do here
+    };
+
+    return () => eventSource.close();
+  }, [user]);
 
   const showToast = useCallback((type, message) => {
     const id = Math.random().toString(36).slice(2);
@@ -102,7 +109,7 @@ export function AppProvider({ children }) {
   const login = useCallback(async (email, password) => {
     const { user, token } = await authService.login(email, password);
     localStorage.setItem("token", token);
-    const normalizedUser = { ...user, role: user.role.toLowerCase() };
+    let normalizedUser = { ...user, role: user.role.toLowerCase() };
     try {
       const fullProfile = await profileService.get();
       normalizedUser = {
@@ -248,6 +255,8 @@ export function AppProvider({ children }) {
         updateAddress,
         deleteAddress,
         setDefaultAddress,
+        unreadCount,
+        refreshUnreadCount,
         toasts,
         showToast,
         dismissToast,
@@ -256,10 +265,4 @@ export function AppProvider({ children }) {
       {children}
     </AppContext.Provider>
   );
-}
-
-export function useApp() {
-  const ctx = useContext(AppContext);
-  if (!ctx) throw new Error("useApp must be used within AppProvider");
-  return ctx;
 }

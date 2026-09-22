@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { useApp } from '../../context/AppContext';
+import { useApp } from '../../context/useApp';
 import Rating from '../../components/customer_Ui/Rating';
 import { StockBadge } from '../../components/customer_Ui/Badge';
 import './Wishlist.css';

@@ -10,7 +10,7 @@ import {
 } from "../../components/admin_Ui/Ui";
 import { useFetch } from "../../hooks/useFetch";
 import { categoryService } from "../../services/categoryService";
-import { useApp } from "../../context/AppContext";
+import { useApp } from "../../context/useApp";
 import "./Categories.css";
 
 export default function Categories() {

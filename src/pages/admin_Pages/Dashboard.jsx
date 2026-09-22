@@ -31,6 +31,7 @@ import {
 import { getDashboardStats } from "../../services/dashboardService";
 import { notificationService } from "../../services/notificationService";
 import { useFetch } from "../../hooks/useFetch";
+import { useApp } from "../../context/useApp";
 
 const activityIcons = {
   order: "🛍️",
@@ -120,6 +121,7 @@ export default function Dashboard({ onNavigate }) {
   const [topProducts, setTopProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const { data: notifs } = useFetch(() => notificationService.list(), []);
+  const { user } = useApp();
 
   useEffect(() => {
     const loadDashboard = async () => {
@@ -148,7 +150,7 @@ export default function Dashboard({ onNavigate }) {
         <div>
           <p className="dashboard-greeting">Good morning,</p>
 
-          <h1 className="dashboard-title">Admin Rivera 👋</h1>
+          <h1 className="dashboard-title">{user?.name || "Admin"} 👋</h1>
         </div>
 
         <div className="dashboard-range-selector">
@@ -460,14 +462,14 @@ export default function Dashboard({ onNavigate }) {
 
             <div className="dashboard-low-stock-list">
               {!loading && lowStockProducts.length === 0 && (
-                <p className="dashboard-product-id">No low stock items</p>
+                <p className="dashboard-product-no-low-stock">No low stock items</p>
               )}
 
               {lowStockProducts.map((item) => (
                 <div key={item.id} className="dashboard-low-stock-item">
                   <div className="dashboard-low-stock-info">
                     <p className="dashboard-product-name">{item.name}</p>
-                    <p className="dashboard-product-id">#{item.id}</p>
+                    <p className="dashboard-product-id">PRD-{item.id}</p>
                   </div>
 
                   <div className="dashboard-stock-info">
@@ -500,7 +502,7 @@ export default function Dashboard({ onNavigate }) {
 
             <div className="dashboard-activity-list">
               {(notifs || []).length === 0 && (
-                <p className="dashboard-activity-time">No recent activity</p>
+                <p className="dashboard-activity-no-activity">No recent activity</p>
               )}
 
               {(notifs || []).slice(0, 6).map((n) => (

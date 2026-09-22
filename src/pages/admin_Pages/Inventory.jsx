@@ -15,7 +15,7 @@ import {
   Pagination,
 } from "../../components/admin_Ui/Ui";
 import { inventoryService } from "../../services/inventoryService";
-import { useApp } from "../../context/AppContext";
+import { useApp } from "../../context/useApp";
 import "./Inventory.css";
 
 function stockStatus(stock) {
@@ -225,7 +225,7 @@ export default function Inventory() {
                   <tr key={item.id}>
                     <td>
                       <p className="inventory-product-name">{item.name}</p>
-                      <p className="inventory-product-id">{item.id}</p>
+                      <p className="inventory-product-id">PRD-{item.id}</p>
                     </td>
                     <td className="inventory-category">
                       {item.category?.name}
@@ -426,7 +426,7 @@ export function LowStock() {
                             <p className="inventory-product-name">
                               {item.name}
                             </p>
-                            <p className="inventory-product-id">{item.id}</p>
+                            <p className="inventory-product-id">PRD-{item.id}</p>
                           </div>
                         </div>
                       </td>

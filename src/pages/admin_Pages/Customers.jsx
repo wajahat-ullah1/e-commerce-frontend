@@ -18,7 +18,7 @@ import {
 } from "../../components/admin_Ui/Ui";
 import { customerService } from "../../services/customerService";
 import { orderService } from "../../services/orderService";
-import { useApp } from "../../context/AppContext";
+import { useApp } from "../../context/useApp";
 import "./Customers.css";
 
 export default function Customers() {

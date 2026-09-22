@@ -8,7 +8,7 @@ import {
   Pagination,
 } from "../../components/admin_Ui/Ui";
 import { invoiceService } from "../../services/invoiceService";
-import { useApp } from "../../context/AppContext";
+import { useApp } from "../../context/useApp";
 import "./Invoices.css";
 
 export default function Invoices() {

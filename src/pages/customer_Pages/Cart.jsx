@@ -1,5 +1,5 @@
 import { Link, useNavigate } from 'react-router-dom';
-import { useApp } from '../../context/AppContext';
+import { useApp } from '../../context/useApp';
 import Breadcrumb from '../../components/customer_Ui/Breadcrumb';
 import QuantitySelector from '../../components/customer_Ui/QuantitySelector';
 import './Cart.css';

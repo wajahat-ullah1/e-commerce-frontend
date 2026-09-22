@@ -15,7 +15,7 @@ import {
   Boxes,
 } from "lucide-react";
 import { useState } from "react";
-import { useApp } from "../../context/AppContext";
+import { useApp } from "../../context/useApp";
 import "./Sidebar.css";
 
 const navItems = [

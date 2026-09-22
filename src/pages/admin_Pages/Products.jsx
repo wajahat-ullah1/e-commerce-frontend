@@ -14,7 +14,7 @@ import {
 } from "../../components/admin_Ui/Ui";
 import { useFetch } from "../../hooks/useFetch";
 import { productService } from "../../services/productService";
-import { useApp } from "../../context/AppContext";
+import { useApp } from "../../context/useApp";
 import "./Products.css";
 
 export default function Products() {
@@ -223,7 +223,7 @@ export default function Products() {
                           />
                           <div>
                             <p className="product-name">{p.name}</p>
-                            <p className="product-id">{p.id}</p>
+                            <p className="product-id">PRD-{p.id}</p>
                           </div>
                         </div>
                       </td>

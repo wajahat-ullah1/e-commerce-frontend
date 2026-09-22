@@ -3,7 +3,7 @@ import { useState } from "react";
 import Sidebar from "../components/admin_Layout/Sidebar";
 import Header from "../components/admin_Layout/Header";
 import "../components/admin_Layout/AdminLayout.css";
-import { useApp } from "../context/AppContext";
+import { useApp } from "../context/useApp";
 
 import Dashboard from "../pages/admin_Pages/Dashboard";
 import Products from "../pages/admin_Pages/Products";
@@ -45,7 +45,7 @@ const PATH_TO_PAGE = Object.fromEntries(
 function AdminLayout() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { logout } = useApp();
+  const { logout, unreadCount } = useApp();
   const [mobileOpen, setMobileOpen] = useState(false);
 
   const relativePath = location.pathname.replace(/^\/admin\/?/, "");
@@ -68,7 +68,7 @@ function AdminLayout() {
         onLogout={handleLogout}
         mobileOpen={mobileOpen}
         onMobileClose={() => setMobileOpen(false)}
-        unreadCount={4}
+        unreadCount={unreadCount}
       />
       <div className="admin-content">
         <Header
@@ -76,7 +76,7 @@ function AdminLayout() {
           onNavigate={handleNavigate}
           onMobileMenuToggle={() => setMobileOpen(true)}
           onLogout={handleLogout}
-          unreadCount={4}
+          unreadCount={unreadCount}
         />
         <main className="admin-main">
           <Outlet />

@@ -421,11 +421,18 @@
   text-overflow: ellipsis;
 }
 
-.dashboard-product-id {
+.dashboard-product-no-low-stock{
   padding-left: 50px;
-  margin-top: -10px;
   padding-bottom: 15px;
+  margin-top: -10px;
   font-size: 16px;
+  color: #9ca3af;
+
+}
+
+.dashboard-product-id {
+  margin-top: -1px;
+  font-size: 12px;
   color: #9ca3af;
 }
 
@@ -457,6 +464,14 @@
 .dashboard-activity-list {
   max-height: 224px;
   overflow-y: auto;
+}
+
+.dashboard-activity-no-activity{
+  margin-top: -5px;
+  padding-left: 15px;
+
+  font-size: 12px;
+  color: #9ca3af;
 }
 
 .dashboard-activity-item {

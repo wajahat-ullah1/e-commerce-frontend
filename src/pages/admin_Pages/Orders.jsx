@@ -10,7 +10,7 @@ import {
 } from "../../components/admin_Ui/Ui";
 import { useFetch } from "../../hooks/useFetch";
 import { orderService } from "../../services/orderService";
-import { useApp } from "../../context/AppContext";
+import { useApp } from "../../context/useApp";
 import "./Orders.css";
 
 function formatStatus(s) {
@@ -39,6 +39,7 @@ export default function Orders() {
     data: orders,
     loading,
     error,
+    refetch,
   } = useFetch(() => orderService.list(), []);
 
   const [search, setSearch] = useState("");
@@ -47,6 +48,11 @@ export default function Orders() {
   const [page, setPage] = useState(1);
 
   const list = orders || [];
+
+  useEffect(() => {
+    const interval = setInterval(refetch, 60000);
+    return () => clearInterval(interval);
+  }, [refetch]);
 
   const filtered = list.filter((o) => {
     const matchSearch =

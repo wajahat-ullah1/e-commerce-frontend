@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { useApp } from '../../context/AppContext.jsx';
+import { useApp } from '../../context/useApp.js';
 import Rating from './Rating.jsx';
 import Badge, { StockBadge } from './Badge.jsx';
 import styles from './ProductCard.module.css';

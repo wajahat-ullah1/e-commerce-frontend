@@ -4,7 +4,7 @@ import { Upload, X, ImageIcon, ArrowLeft } from "lucide-react";
 import { Card, Button, Input } from "../../components/admin_Ui/Ui";
 import { productService } from "../../services/productService";
 import { categoryService } from "../../services/categoryService";
-import { useApp } from "../../context/AppContext";
+import { useApp } from "../../context/useApp";
 import "./AddProduct.css";
 
 export default function AddProduct() {

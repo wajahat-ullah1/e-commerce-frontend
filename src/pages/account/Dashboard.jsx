@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { useApp } from '../../context/AppContext';
+import { useApp } from '../../context/useApp';
 import { orders, notifications } from '../../data/orders';
 import { OrderStatusBadge } from '../../components/customer_Ui/Badge';
 import './Dashboard.css';

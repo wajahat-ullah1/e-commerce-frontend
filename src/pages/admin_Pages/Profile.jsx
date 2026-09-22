@@ -3,7 +3,7 @@ import { Camera, Eye, EyeOff } from "lucide-react";
 import { Card, Button, Input } from "../../components/admin_Ui/Ui";
 import { useFetch } from "../../hooks/useFetch";
 import { profileService } from "../../services/profileService";
-import { useApp } from "../../context/AppContext";
+import { useApp } from "../../context/useApp";
 import "./Profile.css";
 
 import "./Profile.css";

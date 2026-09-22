@@ -10,7 +10,7 @@ import {
   EmptyState,
 } from "../../components/admin_Ui/Ui";
 import { reviewService } from "../../services/reviewService";
-import { useApp } from "../../context/AppContext";
+import { useApp } from "../../context/useApp";
 import "./Reviews.css";
 
 export default function Reviews() {
