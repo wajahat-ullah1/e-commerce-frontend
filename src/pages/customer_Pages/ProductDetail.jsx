@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { products, reviews } from '../../data/products';
+import { productService } from '../../services/productService';
+import { reviewService } from '../../services/reviewService';
 import { useApp } from '../../context/useApp';
 import Breadcrumb from '../../components/customer_Ui/Breadcrumb';
 import Rating, { StarSelector } from '../../components/customer_Ui/Rating';
@@ -9,6 +10,15 @@ import QuantitySelector from '../../components/customer_Ui/QuantitySelector';
 import ProductCard from '../../components/customer_Ui/ProductCard';
 import Modal from '../../components/customer_Ui/Modal';
 import './ProductDetail.css';
+
+function initials(name = '') {
+  return name
+    .trim()
+    .split(/\s+/)
+    .slice(0, 2)
+    .map((w) => w[0])
+    .join('') || '?';
+}
 
 export default function ProductDetail() {
   const { id } = useParams();
@@ -22,17 +32,104 @@ export default function ProductDetail() {
     isLoggedIn,
   } = useApp();
 
-  const product = products.find((p) => p.id === id);
+  const [product, setProduct] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [notFound, setNotFound] = useState(false);
+
+  const [productReviews, setProductReviews] = useState([]);
+  const [related, setRelated] = useState([]);
 
   const [selectedImage, setSelectedImage] = useState(0);
   const [qty, setQty] = useState(1);
   const [reviewModal, setReviewModal] = useState(false);
   const [reviewRating, setReviewRating] = useState(5);
   const [reviewText, setReviewText] = useState('');
+  const [reviewSubmitting, setReviewSubmitting] = useState(false);
   const [reviewSubmitted, setReviewSubmitted] = useState(false);
   const [activeTab, setActiveTab] = useState('description');
 
-  if (!product) {
+  // Load the product itself.
+  useEffect(() => {
+    let cancelled = false;
+    setLoading(true);
+    setNotFound(false);
+    setSelectedImage(0);
+
+    productService
+      .getNormalized(id)
+      .then((p) => {
+        if (!cancelled) setProduct(p);
+      })
+      .catch(() => {
+        if (!cancelled) setNotFound(true);
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [id]);
+
+  // Reviews for this product.
+  useEffect(() => {
+    let cancelled = false;
+    reviewService
+      .listByProduct(id)
+      .then((list) => {
+        if (!cancelled) setProductReviews(list);
+      })
+      .catch(() => {
+        if (!cancelled) setProductReviews([]);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [id]);
+
+  // Related products — same category, excluding this one.
+  useEffect(() => {
+    if (!product?.categoryId) {
+      setRelated([]);
+      return;
+    }
+    let cancelled = false;
+    productService
+      .listPaged({ categoryId: product.categoryId, limit: 5 })
+      .then(({ products: fetched }) => {
+        if (!cancelled) {
+          setRelated(fetched.filter((p) => p.id !== product.id).slice(0, 4));
+        }
+      })
+      .catch(() => {
+        if (!cancelled) setRelated([]);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [product?.categoryId, product?.id]);
+
+  const ratingDist = useMemo(
+    () =>
+      [5, 4, 3, 2, 1].map((star) => {
+        const count = productReviews.filter((r) => r.rating === star).length;
+        return {
+          star,
+          count,
+          pct: productReviews.length
+            ? Math.round((count / productReviews.length) * 100)
+            : 0,
+        };
+      }),
+    [productReviews]
+  );
+
+  if (loading) {
+    return <div className="product-detail-page">Loading product…</div>;
+  }
+
+  if (notFound || !product) {
     return (
       <div className="product-detail-not-found">
         <div className="product-detail-not-found-content">
@@ -52,31 +149,7 @@ export default function ProductDetail() {
     );
   }
 
-  const related = products
-    .filter(
-      (p) => p.category === product.category && p.id !== product.id
-    )
-    .slice(0, 4);
-
-  const productReviews = reviews.filter(
-    (r) => r.productId === product.id
-  );
-
   const inWishlist = wishlistIds.has(product.id);
-
-  const ratingDist = [5, 4, 3, 2, 1].map((star) => {
-    const count = productReviews.filter(
-      (r) => r.rating === star
-    ).length;
-
-    return {
-      star,
-      count,
-      pct: productReviews.length
-        ? Math.round((count / productReviews.length) * 100)
-        : 0,
-    };
-  });
 
   const handleAddToCart = () => {
     addToCart(product, qty);
@@ -87,22 +160,39 @@ export default function ProductDetail() {
     navigate('/checkout');
   };
 
-  const handleReviewSubmit = (e) => {
+  const handleReviewSubmit = async (e) => {
     e.preventDefault();
+    setReviewSubmitting(true);
 
-    setReviewSubmitted(true);
+    try {
+      await reviewService.create(product.id, {
+        rating: reviewRating,
+        comment: reviewText,
+      });
 
-    setTimeout(() => {
-      setReviewModal(false);
-      setReviewSubmitted(false);
-      setReviewText('');
-      setReviewRating(5);
-    }, 2000);
+      setReviewSubmitted(true);
+      // Refresh the review list in the background so the new one shows up.
+      reviewService
+        .listByProduct(id)
+        .then(setProductReviews)
+        .catch(() => {});
 
-    showToast('success', 'Review submitted successfully!');
+      setTimeout(() => {
+        setReviewModal(false);
+        setReviewSubmitted(false);
+        setReviewText('');
+        setReviewRating(5);
+      }, 2000);
+
+      showToast('success', 'Review submitted successfully!');
+    } catch (err) {
+      showToast('error', err.message);
+    } finally {
+      setReviewSubmitting(false);
+    }
   };
 
-  const tabs = ['description', 'details', 'shipping', 'returns'];
+  const tabs = ['description', 'shipping', 'returns'];
 
   const trustIndicators = [
     {
@@ -129,7 +219,7 @@ export default function ProductDetail() {
             { label: 'Shop', to: '/shop' },
             {
               label: product.category,
-              to: `/shop?category=${product.category}`,
+              to: `/shop?category=${product.categoryId}`,
             },
             { label: product.name },
           ]}
@@ -137,14 +227,20 @@ export default function ProductDetail() {
 
         <div className="product-detail-main">
 
-          {/* Image Gallery */}
+          {/* Image Gallery — admins can post several angles of the same
+              product; the first one they set as primary shows by default
+              and the rest are browsable as thumbnails. */}
           <div className="product-gallery">
             <div className="product-main-image-wrapper">
-              <img
-                src={product.images[selectedImage]}
-                alt={product.name}
-                className="product-main-image"
-              />
+              {product.images.length > 0 ? (
+                <img
+                  src={product.images[selectedImage]}
+                  alt={product.name}
+                  className="product-main-image"
+                />
+              ) : (
+                <div className="product-main-image product-main-image-empty" />
+              )}
             </div>
 
             {product.images.length > 1 && (
@@ -190,20 +286,6 @@ export default function ProductDetail() {
               <span className="product-price">
                 ${product.price.toFixed(2)}
               </span>
-
-              {product.originalPrice && (
-                <>
-                  <span className="product-original-price">
-                    ${product.originalPrice.toFixed(2)}
-                  </span>
-
-                  <span className="product-discount">
-                    -{Math.round(
-                      (1 - product.price / product.originalPrice) * 100
-                    )}%
-                  </span>
-                </>
-              )}
             </div>
 
             <div className="product-stock-section">
@@ -329,31 +411,6 @@ export default function ProductDetail() {
                   <p>{product.description}</p>
                 )}
 
-                {activeTab === 'details' && (
-                  <ul className="product-details-list">
-                    {product.details.map((detail, i) => (
-                      <li key={i}>
-                        <svg
-                          width="16"
-                          height="16"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M5 13l4 4L19 7"
-                          />
-                        </svg>
-
-                        {detail}
-                      </li>
-                    ))}
-                  </ul>
-                )}
-
                 {activeTab === 'shipping' && (
                   <div className="product-tab-text">
                     <p>
@@ -473,18 +530,16 @@ export default function ProductDetail() {
                   >
                     <div className="review-card-header">
 
-                      <img
-                        src={review.avatar}
-                        alt={review.author}
-                        className="review-avatar"
-                      />
+                      <div className="review-avatar-initials">
+                        {initials(review.user?.name)}
+                      </div>
 
                       <div className="review-author-info">
-                        <p>{review.author}</p>
+                        <p>{review.user?.name || 'Anonymous'}</p>
 
                         <span>
                           {new Date(
-                            review.date
+                            review.createdAt
                           ).toLocaleDateString('en-US', {
                             year: 'numeric',
                             month: 'long',
@@ -500,7 +555,7 @@ export default function ProductDetail() {
                     </div>
 
                     <p className="review-text">
-                      {review.text}
+                      {review.comment}
                     </p>
                   </div>
                 ))
@@ -607,11 +662,17 @@ export default function ProductDetail() {
 
               </div>
 
+              <p className="review-form-note">
+                You can only review products from orders that have
+                been delivered to you.
+              </p>
+
               <button
                 type="submit"
+                disabled={reviewSubmitting}
                 className="submit-review-btn"
               >
-                Submit Review
+                {reviewSubmitting ? 'Submitting…' : 'Submit Review'}
               </button>
 
             </form>

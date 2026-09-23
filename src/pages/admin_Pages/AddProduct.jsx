@@ -1,11 +1,13 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { Upload, X, ImageIcon, ArrowLeft } from "lucide-react";
+import { Upload, X, Star, ArrowLeft } from "lucide-react";
 import { Card, Button, Input } from "../../components/admin_Ui/Ui";
 import { productService } from "../../services/productService";
 import { categoryService } from "../../services/categoryService";
 import { useApp } from "../../context/useApp";
 import "./AddProduct.css";
+
+const MAX_IMAGES = 8;
 
 export default function AddProduct() {
   const navigate = useNavigate();
@@ -22,9 +24,16 @@ export default function AddProduct() {
   });
 
   const [categories, setCategories] = useState([]);
-  const [imageFile, setImageFile] = useState(null);
-  const [imagePreview, setImagePreview] = useState("");
-  const [imageState, setImageState] = useState("empty");
+
+  // Unified gallery — each item is either an existing image already saved on
+  // the product ({ kind: "existing", id, url }) or a file picked in this
+  // session ({ kind: "new", uid, file, url }). Index 0 is always the
+  // "primary" image shown on the shop, admin list, etc. `imagesTouched`
+  // tracks whether the admin actually opened/changed the gallery during an
+  // edit, so an untouched edit never sends an image diff to the backend.
+  const [gallery, setGallery] = useState([]);
+  const [imagesTouched, setImagesTouched] = useState(false);
+
   const [errors, setErrors] = useState({});
   const [saving, setSaving] = useState(false);
   const [showDelete, setShowDelete] = useState(false);
@@ -42,9 +51,17 @@ export default function AddProduct() {
           price: String(product.price ?? ""),
           stock: String(product.stock ?? ""),
         });
-        if (product.image) {
-          setImagePreview(product.image);
-          setImageState("uploaded");
+        if (product.images?.length) {
+          setGallery(
+            product.images.map((img) => ({
+              kind: "existing",
+              id: img.id,
+              url: img.url,
+            })),
+          );
+        } else if (product.image) {
+          // Fallback in case an older product only has the convenience field.
+          setGallery([{ kind: "existing", id: null, url: product.image }]);
         }
       })
       .catch((err) => showToast("error", err.message))
@@ -95,8 +112,18 @@ export default function AddProduct() {
       formData.append("categoryId", form.category);
       formData.append("price", form.price);
       formData.append("stock", form.stock);
-      if (imageFile) {
-        formData.append("image", imageFile);
+
+      // Only include image changes if the admin actually touched the
+      // gallery (added/removed/reordered) — on a fresh create the gallery
+      // itself IS the change, so always send it there.
+      if (!isEdit || imagesTouched) {
+        const imageOrder = gallery.map((item) =>
+          item.kind === "existing" ? String(item.id) : "new",
+        );
+        formData.append("imageOrder", JSON.stringify(imageOrder));
+        gallery
+          .filter((item) => item.kind === "new")
+          .forEach((item) => formData.append("images", item.file));
       }
 
       if (isEdit) {
@@ -117,12 +144,50 @@ export default function AddProduct() {
   const handleUploadClick = () => fileInputRef.current?.click();
 
   const handleFileChange = (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-    setImageFile(file);
-    setImagePreview(URL.createObjectURL(file));
-    setImageState("uploaded");
+    const files = Array.from(e.target.files || []);
+    if (!files.length) return;
+
+    const room = MAX_IMAGES - gallery.length;
+    if (room <= 0) {
+      showToast("error", `You can add up to ${MAX_IMAGES} images per product.`);
+      e.target.value = "";
+      return;
+    }
+
+    const accepted = files.slice(0, room);
+    if (files.length > room) {
+      showToast(
+        "error",
+        `Only ${room} more image(s) can be added (max ${MAX_IMAGES}).`,
+      );
+    }
+
+    const newItems = accepted.map((file) => ({
+      kind: "new",
+      uid: `${file.name}-${file.size}-${file.lastModified}-${Math.random()}`,
+      file,
+      url: URL.createObjectURL(file),
+    }));
+
+    setGallery((prev) => [...prev, ...newItems]);
+    setImagesTouched(true);
     e.target.value = "";
+  };
+
+  const itemKey = (item) =>
+    item.kind === "existing" ? `existing-${item.id}` : `new-${item.uid}`;
+
+  const removeImage = (item) => {
+    setGallery((prev) => prev.filter((g) => itemKey(g) !== itemKey(item)));
+    setImagesTouched(true);
+  };
+
+  const makePrimary = (item) => {
+    setGallery((prev) => [
+      item,
+      ...prev.filter((g) => itemKey(g) !== itemKey(item)),
+    ]);
+    setImagesTouched(true);
   };
 
   const updateForm = (field, value) =>
@@ -213,95 +278,80 @@ export default function AddProduct() {
 
         <Card className="add-product-image-card">
           <h2 className="add-product-section-title add-product-image-title">
-            Product Image
+            Product Images
           </h2>
+          <p className="add-product-image-hint">
+            Add photos of this product from different angles. The first image is
+            shown as the main photo in the shop.
+          </p>
 
           <input
             type="file"
             accept="image/*"
+            multiple
             ref={fileInputRef}
             onChange={handleFileChange}
             style={{ display: "none" }}
           />
 
-          {imageState === "empty" && (
+          {gallery.length === 0 ? (
             <div onClick={handleUploadClick} className="add-product-upload-box">
               <div className="add-product-upload-icon">
                 <Upload />
               </div>
               <div>
-                <p className="add-product-upload-title">Drop image here</p>
+                <p className="add-product-upload-title">Drop images here</p>
                 <p className="add-product-upload-description">
-                  PNG, JPG, WEBP up to 5MB
+                  PNG, JPG, WEBP up to 5MB each — up to {MAX_IMAGES} images
                 </p>
               </div>
               <Button variant="secondary" size="sm">
                 Browse Files
               </Button>
             </div>
-          )}
-          {imageState === "uploading" && (
-            <div className="add-product-upload-box add-product-uploading">
-              <svg
-                className="add-product-spinner"
-                viewBox="0 0 24 24"
-                fill="none"
-              >
-                <circle
-                  className="add-product-spinner-circle"
-                  cx="12"
-                  cy="12"
-                  r="10"
-                  stroke="currentColor"
-                  strokeWidth="3"
-                />
-                <path
-                  className="add-product-spinner-path"
-                  fill="currentColor"
-                  d="M4 12a8 8 0 018-8v8H4z"
-                />
-              </svg>
-              <p className="add-product-uploading-text">Uploading image…</p>
-            </div>
-          )}
-          {imageState === "uploaded" && (
-            <div className="add-product-image-preview">
-              <div className="add-product-image-wrapper">
-                <img
-                  src={imagePreview}
-                  alt="Product"
-                  className="add-product-image"
-                />
+          ) : (
+            <div className="add-product-image-grid">
+              {gallery.map((item, index) => (
+                <div key={itemKey(item)} className="add-product-image-tile">
+                  <img src={item.url} alt="" className="add-product-tile-img" />
+
+                  {index === 0 && (
+                    <span className="add-product-tile-primary-badge">
+                      Primary
+                    </span>
+                  )}
+
+                  <button
+                    type="button"
+                    onClick={() => removeImage(item)}
+                    className="add-product-tile-remove"
+                    aria-label="Remove image"
+                  >
+                    <X />
+                  </button>
+
+                  {index !== 0 && (
+                    <button
+                      type="button"
+                      onClick={() => makePrimary(item)}
+                      className="add-product-tile-make-primary"
+                    >
+                      <Star /> Make Primary
+                    </button>
+                  )}
+                </div>
+              ))}
+
+              {gallery.length < MAX_IMAGES && (
                 <button
-                  onClick={() => {
-                    setImageState("empty");
-                    setImageFile(null);
-                    setImagePreview("");
-                  }}
-                  className="add-product-remove-image"
-                >
-                  <X />
-                </button>
-              </div>
-              <div className="add-product-image-actions">
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  className="add-product-replace-button"
+                  type="button"
                   onClick={handleUploadClick}
+                  className="add-product-image-add-tile"
                 >
-                  Replace
-                </Button>
-              </div>
-            </div>
-          )}
-          {imageState === "error" && (
-            <div className="add-product-upload-error">
-              <ImageIcon className="add-product-error-image-icon" />
-              <p className="add-product-upload-error-title">Upload failed</p>
-              <Button variant="outline" size="sm" onClick={handleUpload}>
-                Try again
-              </Button>
+                  <Upload />
+                  <span>Add Image</span>
+                </button>
+              )}
             </div>
           )}
         </Card>

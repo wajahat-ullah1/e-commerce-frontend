@@ -95,6 +95,10 @@
   transform: scale(1.05);
 }
 
+.product-main-image-empty {
+  background: #e2e8f0;
+}
+
 .product-thumbnail-list {
   display: flex;
   gap: 12px;
@@ -550,6 +554,21 @@
   object-fit: cover;
 }
 
+.review-avatar-initials {
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: #4f46e5;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
 .review-author-info {
   min-width: 0;
 }
@@ -695,6 +714,12 @@
 .review-form-field textarea:focus {
   border-color: #6366f1;
   box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.15);
+}
+
+.review-form-note {
+  margin: -8px 0 0;
+  color: #94a3b8;
+  font-size: 12px;
 }
 
 .submit-review-btn {

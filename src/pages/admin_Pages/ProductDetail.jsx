@@ -13,25 +13,45 @@ export default function ProductDetail() {
 
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [activeImage, setActiveImage] = useState(0);
 
   useEffect(() => {
     productService
       .get(id)
-      .then(setProduct)
+      .then((p) => {
+        setProduct(p);
+        setActiveImage(0);
+      })
       .catch((err) => showToast("error", err.message))
       .finally(() => setLoading(false));
   }, [id]);
 
-  if (loading) return <div className="product-detail-page">Loading product…</div>;
-  if (!product) return <div className="product-detail-page">Product not found.</div>;
+  if (loading)
+    return <div className="product-detail-page">Loading product…</div>;
+  if (!product)
+    return <div className="product-detail-page">Product not found.</div>;
 
   const status =
-    product.stock === 0 ? "Out of Stock" : product.stock < 10 ? "Low Stock" : "In Stock";
+    product.stock === 0
+      ? "Out of Stock"
+      : product.stock < 10
+        ? "Low Stock"
+        : "In Stock";
+
+  const images = product.images?.length
+    ? product.images
+    : product.image
+      ? [{ id: "main", url: product.image }]
+      : [];
 
   return (
     <div className="product-detail-page">
       <div className="product-detail-header">
-        <button type="button" onClick={() => navigate("/admin/products")} className="product-detail-back">
+        <button
+          type="button"
+          onClick={() => navigate("/admin/products")}
+          className="product-detail-back"
+        >
           <ArrowLeft className="product-detail-back-icon" />
           All Products
         </button>
@@ -45,18 +65,41 @@ export default function ProductDetail() {
       <div className="product-detail-grid">
         <div className="product-detail-image-column">
           <div className="product-detail-image-card">
-            <img src={product.image} alt={product.name} className="product-detail-image" />
+            <img
+              src={images[activeImage]?.url || product.image}
+              alt={product.name}
+              className="product-detail-image"
+            />
             <div className="product-detail-status-wrapper">
               <StatusBadge status={status} />
             </div>
           </div>
+
+          {images.length > 1 && (
+            <div className="product-detail-thumbnail-list">
+              {images.map((img, i) => (
+                <button
+                  key={img.id ?? i}
+                  type="button"
+                  onClick={() => setActiveImage(i)}
+                  className={`product-detail-thumbnail ${
+                    activeImage === i ? "product-detail-thumbnail-active" : ""
+                  }`}
+                >
+                  <img src={img.url} alt="" />
+                </button>
+              ))}
+            </div>
+          )}
         </div>
 
         <div className="product-detail-info-column">
           <div className="product-detail-info-card">
             <h1 className="product-detail-name">{product.name}</h1>
             <p className="product-detail-category">{product.category?.name}</p>
-            <p className="product-detail-price">PKR-{Number(product.price).toFixed(2)}</p>
+            <p className="product-detail-price">
+              PKR-{Number(product.price).toFixed(2)}
+            </p>
             <p className="product-detail-description">{product.description}</p>
 
             {product.rating != null && (
@@ -70,8 +113,18 @@ export default function ProductDetail() {
               {[
                 ["Stock", `${product.stock} units`],
                 ["Category", product.category?.name || "—"],
-                ["Created", product.createdAt ? new Date(product.createdAt).toLocaleDateString("en-GB") : "—"],
-                ["Updated", product.updatedAt ? new Date(product.updatedAt).toLocaleDateString("en-GB") : "—"],
+                [
+                  "Created",
+                  product.createdAt
+                    ? new Date(product.createdAt).toLocaleDateString("en-GB")
+                    : "—",
+                ],
+                [
+                  "Updated",
+                  product.updatedAt
+                    ? new Date(product.updatedAt).toLocaleDateString("en-GB")
+                    : "—",
+                ],
               ].map(([label, value]) => (
                 <div key={label} className="product-detail-stat">
                   <p className="product-detail-stat-label">{label}</p>
