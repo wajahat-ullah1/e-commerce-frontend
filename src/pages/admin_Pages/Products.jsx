@@ -46,7 +46,7 @@ export default function Products() {
     const matchSearch =
       p.name.toLowerCase().includes(search.toLowerCase()) ||
       String(p.id).toLowerCase().includes(search.toLowerCase());
-    const matchCat = catFilter === "all" || p.category?.id === catFilter;
+    const matchCat = catFilter === "all" || String(p.category?.id) === catFilter;
     const matchStock =
       stockFilter === "all" ||
       (stockFilter === "low" && p.stock > 0 && p.stock < 10) ||
@@ -229,7 +229,7 @@ export default function Products() {
                       </td>
                       <td className="product-category">{p.category?.name}</td>
                       <td className="product-price">
-                        ${Number(p.price).toFixed(2)}
+                        {Number(p.price).toFixed(2)}
                       </td>
                       <td className="product-stock">
                         <span

@@ -114,7 +114,7 @@ export default function Invoices() {
                       </td>
 
                       <td className="invoices-amount">
-                        ${(Number(inv.totalAmount) + Number(500)).toFixed(2)}
+                        {Number(inv.totalAmount).toFixed(2)}
                       </td>
 
                       <td>
@@ -321,11 +321,6 @@ export function InvoiceDetail() {
                 <span>Order Status</span>
                 <StatusBadge status={inv.order?.status} />
               </div>
-
-              <div className="invoice-info-row">
-                <span>Order Status</span>
-                <StatusBadge status={inv.order?.status} />
-              </div>
             </div>
           </div>
         </div>
@@ -353,11 +348,11 @@ export function InvoiceDetail() {
                   <td className="invoice-item-center">{item.quantity}</td>
 
                   <td className="invoice-item-right invoice-muted">
-                    ${Number(item.price).toFixed(2)}
+                    {Number(item.price).toFixed(2)}
                   </td>
 
                   <td className="invoice-item-right invoice-item-total">
-                    ${(Number(item.price) * item.quantity).toFixed(2)}
+                    {(Number(item.price) * item.quantity).toFixed(2)}
                   </td>
                 </tr>
               ))}
@@ -369,17 +364,17 @@ export function InvoiceDetail() {
         <div className="invoice-summary">
           <div className="invoice-summary-row">
             <span>Subtotal</span>
-            <span>${Number(inv.totalAmount).toFixed(2)}</span>
+            <span>{Number(inv.totalAmount).toFixed(2)}</span>
           </div>
 
           <div className="invoice-summary-row">
             <span>Shipping</span>
-            <span>$500</span>
+            <span>0</span>
           </div>
 
           <div className="invoice-total-row">
             <span>Total</span>
-            <span>${(Number(inv.totalAmount) + Number(500)).toFixed(2)}</span>
+            <span>${Number(inv.totalAmount).toFixed(2)}</span>
           </div>
         </div>
 

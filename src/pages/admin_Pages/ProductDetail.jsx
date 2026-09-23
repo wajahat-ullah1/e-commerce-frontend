@@ -56,7 +56,7 @@ export default function ProductDetail() {
           <div className="product-detail-info-card">
             <h1 className="product-detail-name">{product.name}</h1>
             <p className="product-detail-category">{product.category?.name}</p>
-            <p className="product-detail-price">${Number(product.price).toFixed(2)}</p>
+            <p className="product-detail-price">PKR-{Number(product.price).toFixed(2)}</p>
             <p className="product-detail-description">{product.description}</p>
 
             {product.rating != null && (
