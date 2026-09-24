@@ -9,6 +9,9 @@ import {
 import { authService } from "../services/authService";
 import { profileService } from "../services/profileService";
 import { notificationService } from "../services/notificationService";
+import { cartService, guestCartService } from "../services/cartService";
+import { normalizeProduct } from "../services/productService";
+import { addressService } from "../services/addressService";
 
 // ── Context ───────────────────────────────────────────────────────────────────
 
@@ -95,7 +98,11 @@ export function AppProvider({ children }) {
   // ── Auth ────────────────────────────────────────────────────────────────────
 
   const register = useCallback(async (payload) => {
-    const { user, token } = await authService.register(payload);
+    const storedGuestCartId = localStorage.getItem("guestCartId");
+    const { user, token } = await authService.register({
+      ...payload,
+      guestCartId: storedGuestCartId || undefined,
+    });
     const normalizedUser = {
       ...user,
       role: (user.role || "customer").toLowerCase(),
@@ -103,11 +110,20 @@ export function AppProvider({ children }) {
     localStorage.setItem("token", token);
     localStorage.setItem("user", JSON.stringify(normalizedUser));
     setUser(normalizedUser);
+    if (storedGuestCartId) {
+      localStorage.removeItem("guestCartId");
+      setGuestCartId(null);
+    }
     return normalizedUser;
   }, []);
 
   const login = useCallback(async (email, password) => {
-    const { user, token } = await authService.login(email, password);
+    const storedGuestCartId = localStorage.getItem("guestCartId");
+    const { user, token } = await authService.login(
+      email,
+      password,
+      storedGuestCartId || undefined,
+    );
     localStorage.setItem("token", token);
     let normalizedUser = { ...user, role: user.role.toLowerCase() };
     try {
@@ -122,6 +138,10 @@ export function AppProvider({ children }) {
     }
     localStorage.setItem("user", JSON.stringify(normalizedUser));
     setUser(normalizedUser);
+    if (storedGuestCartId) {
+      localStorage.removeItem("guestCartId");
+      setGuestCartId(null);
+    }
     return normalizedUser;
   }, []);
 
@@ -132,6 +152,27 @@ export function AppProvider({ children }) {
     localStorage.removeItem("user");
     localStorage.removeItem("token");
   }, []);
+
+  const registerFromGuestOrder = useCallback(
+    async ({ orderId, guestCartId, password }) => {
+      const { user, token } = await authService.registerFromGuestOrder({
+        orderId,
+        guestCartId: guestCartId || undefined,
+        password,
+      });
+      const normalizedUser = {
+        ...user,
+        role: (user.role || "customer").toLowerCase(),
+      };
+      localStorage.setItem("token", token);
+      localStorage.setItem("user", JSON.stringify(normalizedUser));
+      setUser(normalizedUser);
+      localStorage.removeItem("guestCartId");
+      setGuestCartId(null);
+      return normalizedUser;
+    },
+    [],
+  );
 
   //__ Profile __________________________________________________________________
   const updateUser = useCallback((updates) => {
@@ -145,44 +186,141 @@ export function AppProvider({ children }) {
       return merged;
     });
   }, []);
+
   // ── Cart ────────────────────────────────────────────────────────────────────
-  const addToCart = useCallback(
-    (product, qty = 1) => {
-      setCart((prev) => {
-        const existing = prev.find((i) => i.product.id === product.id);
-        if (existing) {
-          return prev.map((i) =>
-            i.product.id === product.id
-              ? { ...i, quantity: i.quantity + qty }
-              : i,
-          );
-        }
-        return [...prev, { product, quantity: qty }];
-      });
-      showToast("success", `${product.name} added to cart`);
-    },
-    [showToast],
+
+  const [guestCartId, setGuestCartId] = useState(
+    () => localStorage.getItem("guestCartId") || null,
   );
 
-  const removeFromCart = useCallback((productId) => {
-    setCart((prev) => prev.filter((i) => i.product.id !== productId));
-  }, []);
+  function mapCartItems(items = []) {
+    return items.map((item) => ({
+      product: normalizeProduct(item.product),
+      quantity: item.quantity,
+    }));
+  }
 
-  const updateQuantity = useCallback((productId, qty) => {
-    if (qty <= 0) {
-      setCart((prev) => prev.filter((i) => i.product.id !== productId));
-    } else {
-      setCart((prev) =>
-        prev.map((i) =>
-          i.product.id === productId ? { ...i, quantity: qty } : i,
-        ),
-      );
+  const loadCart = useCallback(async () => {
+    try {
+      if (user) {
+        const serverCart = await cartService.get();
+        setCart(mapCartItems(serverCart?.items));
+        return;
+      }
+      const storedGuestCartId = localStorage.getItem("guestCartId");
+      if (!storedGuestCartId) {
+        setCart([]);
+        return;
+      }
+      const guestCart = await guestCartService.get(storedGuestCartId);
+      setCart(mapCartItems(guestCart?.items));
+    } catch {
+      if (!user) {
+        localStorage.removeItem("guestCartId");
+        setGuestCartId(null);
+      }
+      setCart([]);
     }
+  }, [user]);
+
+  useEffect(() => {
+    loadCart();
+  }, [loadCart]);
+
+  const ensureGuestCartId = useCallback(async () => {
+    let id = localStorage.getItem("guestCartId");
+    if (id) return id;
+    const guestCart = await guestCartService.create();
+    localStorage.setItem("guestCartId", guestCart.id);
+    setGuestCartId(guestCart.id);
+    return guestCart.id;
   }, []);
 
-  const clearCart = useCallback(() => setCart([]), []);
+  const addToCart = useCallback(
+    async (product, qty = 1) => {
+      try {
+        if (user) {
+          await cartService.add(product.id, qty);
+        } else {
+          const guestCartId = await ensureGuestCartId();
+          await guestCartService.add(guestCartId, product.id, qty);
+        }
+        setCart((prev) => {
+          const existing = prev.find((i) => i.product.id === product.id);
+          if (existing) {
+            return prev.map((i) =>
+              i.product.id === product.id
+                ? { ...i, quantity: i.quantity + qty }
+                : i,
+            );
+          }
+          return [...prev, { product, quantity: qty }];
+        });
+        showToast("success", `${product.name} added to cart`);
+      } catch (err) {
+        showToast("error", err.message || "Couldn't add to cart");
+      }
+    },
+    [user, ensureGuestCartId, showToast],
+  );
+
+  const removeFromCart = useCallback(
+    async (productId) => {
+      try {
+        if (user) {
+          await cartService.remove(productId);
+        } else {
+          const guestCartId = localStorage.getItem("guestCartId");
+          if (guestCartId)
+            await guestCartService.remove(guestCartId, productId);
+        }
+        setCart((prev) => prev.filter((i) => i.product.id !== productId));
+      } catch (err) {
+        showToast("error", err.message || "Couldn't remove item");
+      }
+    },
+    [user, showToast],
+  );
+
+  const updateQuantity = useCallback(
+    async (productId, qty) => {
+      if (qty <= 0) return removeFromCart(productId);
+      try {
+        if (user) {
+          await cartService.update(productId, qty);
+        } else {
+          const guestCartId = localStorage.getItem("guestCartId");
+          if (guestCartId)
+            await guestCartService.update(guestCartId, productId, qty);
+        }
+        setCart((prev) =>
+          prev.map((i) =>
+            i.product.id === productId ? { ...i, quantity: qty } : i,
+          ),
+        );
+      } catch (err) {
+        showToast("error", err.message || "Couldn't update quantity");
+      }
+    },
+    [user, removeFromCart, showToast],
+  );
+
+  const clearCart = useCallback(async () => {
+    try {
+      const storedGuestCartId = localStorage.getItem("guestCartId");
+      if (storedGuestCartId) {
+        await guestCartService.clear(storedGuestCartId);
+        localStorage.removeItem("guestCartId");
+        setGuestCartId(null);
+      }
+    } catch {
+      // non-critical — clear local state regardless
+    }
+    setCart([]);
+  }, []);
 
   // ── Wishlist ────────────────────────────────────────────────────────────────
+
   const wishlistIds = new Set(wishlist.map((p) => p.id));
   const toggleWishlist = useCallback(
     (product) => {
@@ -200,30 +338,47 @@ export function AppProvider({ children }) {
   );
 
   // ── Addresses ───────────────────────────────────────────────────────────────
-  const addAddress = useCallback((addr) => {
-    const id = "addr-" + Math.random().toString(36).slice(2);
+
+  const loadAddresses = useCallback(async () => {
+    if (!user) {
+      setAddresses([]);
+      return;
+    }
+    try {
+      const list = await addressService.list();
+      setAddresses(list);
+    } catch {
+      setAddresses([]);
+    }
+  }, [user]);
+
+  useEffect(() => {
+    loadAddresses();
+  }, [loadAddresses]);
+
+  const addAddress = useCallback(async (addr) => {
+    const created = await addressService.create(addr);
     setAddresses((prev) => {
-      if (addr.isDefault) {
-        return [
-          ...prev.map((a) => ({ ...a, isDefault: false })),
-          { ...addr, id },
-        ];
-      }
-      return [...prev, { ...addr, id }];
+      const next = created.isDefault
+        ? prev.map((a) => ({ ...a, isDefault: false }))
+        : prev;
+      return [...next, created];
     });
+    return created; // Checkout.jsx needs the new id
   }, []);
 
-  const updateAddress = useCallback((id, addr) => {
-    setAddresses((prev) =>
-      prev.map((a) => (a.id === id ? { ...a, ...addr } : a)),
-    );
+  const updateAddress = useCallback(async (id, addr) => {
+    const updated = await addressService.update(id, addr);
+    setAddresses((prev) => prev.map((a) => (a.id === id ? updated : a)));
   }, []);
 
-  const deleteAddress = useCallback((id) => {
+  const deleteAddress = useCallback(async (id) => {
+    await addressService.remove(id);
     setAddresses((prev) => prev.filter((a) => a.id !== id));
   }, []);
 
-  const setDefaultAddress = useCallback((id) => {
+  const setDefaultAddress = useCallback(async (id) => {
+    await addressService.setDefault(id);
     setAddresses((prev) => prev.map((a) => ({ ...a, isDefault: a.id === id })));
   }, []);
 
@@ -239,8 +394,10 @@ export function AppProvider({ children }) {
         register,
         login,
         logout,
+        registerFromGuestOrder,
         updateUser,
         cart,
+        guestCartId,
         cartCount,
         cartTotal,
         addToCart,

@@ -1,8 +1,8 @@
 import { api } from "./api";
 
 export const authService = {
-  login: (email, password) =>
-    api.post("/auth/login", { email, password }, { auth: false }),
+  login: (email, password, guestCartId) =>
+    api.post("/auth/login", { email, password, guestCartId }, { auth: false }),
 
   register: (payload) => api.post("/auth/register", payload, { auth: false }),
 
@@ -13,4 +13,7 @@ export const authService = {
     api.post(`/auth/reset-password/${token}`, { password }, { auth: false }),
 
   logout: () => api.post("/auth/logout", {}),
+
+  registerFromGuestOrder: (payload) =>
+    api.post("/auth/register-from-order", payload, { auth: false }),
 };

@@ -1,12 +1,5 @@
 import { api } from "./api";
 
-// The API returns the raw Prisma shape (`images`: an ordered array of
-// {id, url, publicId, position}, `category` as {id, name}, `price` as a
-// Decimal-string, `totalReviews` instead of `reviewCount`, etc). The
-// customer-facing UI (ProductCard, Shop, ProductDetail...) was built against
-// a simpler shape, so we normalize here rather than touching every
-// component. Admin pages already consume the raw shape directly
-// (see admin_Pages/ProductDetail.jsx), so `list`/`get` below are left untouched.
 export function normalizeProduct(p) {
   if (!p) return p;
   return {

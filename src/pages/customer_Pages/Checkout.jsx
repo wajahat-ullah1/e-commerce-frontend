@@ -1,78 +1,25 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useApp } from '../../context/useApp';
-import './Checkout.css';
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useApp } from "../../context/useApp";
+import { orderService } from "../../services/orderService";
+import "./Checkout.css";
 
 const STEPS = [
-  { n: 1, label: 'Customer Info' },
-  { n: 2, label: 'Shipping' },
-  { n: 3, label: 'Review Order' },
-  { n: 4, label: 'Payment' },
+  { n: 1, label: "Customer Info" },
+  { n: 2, label: "Shipping" },
+  { n: 3, label: "Review Order" },
+  { n: 4, label: "Payment" },
 ];
 
-export default function Checkout() {
-  const { cart, cartTotal, isLoggedIn, addresses, clearCart } = useApp();
-  const navigate = useNavigate();
-
-  const [step, setStep] = useState(1);
-
-  const [guest, setGuest] = useState({
-    name: '',
-    phone: '',
-    email: '',
-  });
-
-  const [addr, setAddr] = useState({
-    line1: '',
-    line2: '',
-    city: '',
-    state: '',
-    postalCode: '',
-    country: 'United States',
-  });
-
-  const [selectedAddrId, setSelectedAddrId] = useState(
-    addresses.find((a) => a.isDefault)?.id || ''
-  );
-
-  const [placing, setPlacing] = useState(false);
-
-  const selectedAddr = addresses.find((a) => a.id === selectedAddrId);
-
-  const handlePlaceOrder = async () => {
-    setPlacing(true);
-
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-
-    clearCart();
-
-    navigate('/order-confirmation', {
-      state: {
-        orderNumber: Math.floor(
-          100000 + Math.random() * 900000
-        ).toString(),
-        customer: isLoggedIn
-          ? {
-              name: 'Alex Johnson',
-              phone: '+1 555 0123',
-              email: 'alex@example.com',
-            }
-          : guest,
-        address: isLoggedIn ? selectedAddr : addr,
-        items: cart,
-        total: cartTotal,
-      },
-    });
-  };
-
-  const InputField = ({
-    label,
-    value,
-    onChange,
-    required = false,
-    type = 'text',
-    placeholder = '',
-  }) => (
+function InputField({
+  label,
+  value,
+  onChange,
+  required = false,
+  type = "text",
+  placeholder = "",
+}) {
+  return (
     <div className="checkout-field">
       <label className="checkout-label">
         {label}
@@ -89,13 +36,137 @@ export default function Checkout() {
       />
     </div>
   );
+}
+
+export default function Checkout() {
+  const {
+    user,
+    cart,
+    cartTotal,
+    isLoggedIn,
+    addresses,
+    clearCart,
+    addAddress,
+    guestCartId,
+    showToast,
+  } = useApp();
+  const navigate = useNavigate();
+
+  const [step, setStep] = useState(1);
+
+  const [guest, setGuest] = useState({
+    name: "",
+    phone: "",
+    email: "",
+  });
+
+  const [addr, setAddr] = useState({
+    line1: "",
+    line2: "",
+    city: "",
+    state: "",
+    postalCode: "",
+    country: "United States",
+  });
+
+  const [selectedAddrId, setSelectedAddrId] = useState(
+    addresses.find((a) => a.isDefault)?.id || "",
+  );
+
+  const [placing, setPlacing] = useState(false);
+
+  const selectedAddr = addresses.find((a) => a.id === selectedAddrId);
+
+  const handlePlaceOrder = async () => {
+    if (!isLoggedIn && (!guest.name.trim() || !guest.phone.trim())) {
+      showToast("error", "Please fill in your name and phone number.");
+      setStep(1);
+      return;
+    }
+
+    const usingSavedAddress = isLoggedIn && !!selectedAddrId;
+    if (
+      !usingSavedAddress &&
+      (!addr.line1.trim() || !addr.city.trim() || !addr.postalCode.trim())
+    ) {
+      showToast("error", "Please complete your shipping address.");
+      setStep(2);
+      return;
+    }
+
+    setPlacing(true);
+
+    try {
+      let order;
+
+      if (isLoggedIn) {
+        let addressId = selectedAddrId;
+
+        // No saved address chosen — the manual fields become a new saved
+        // address, then we check out against it.
+        if (!addressId) {
+          const created = await addAddress(addr);
+          addressId = created.id;
+        }
+
+        order = await orderService.checkout(addressId);
+      } else {
+        if (!guestCartId) {
+          throw new Error(
+            "Your cart could not be found. Please add an item again.",
+          );
+        }
+        order = await orderService.guestCheckout({
+          guestCartId,
+          fullName: guest.name,
+          phone: guest.phone,
+          email: guest.email || undefined,
+          addressLine1: addr.line1,
+          addressLine2: addr.line2 || undefined,
+          city: addr.city,
+          state: addr.state || undefined,
+          postalCode: addr.postalCode,
+          country: addr.country,
+        });
+      }
+
+      // Snapshot before clearCart() wipes local state.
+      const placedItems = cart;
+      const placedTotal = cartTotal;
+      const placedGuestCartId = guestCartId;
+
+      await clearCart();
+
+      navigate("/order-confirmation", {
+        state: {
+          orderId: order.id,
+          orderNumber: String(order.id),
+          customer: isLoggedIn
+            ? {
+                name: order.customerName,
+                phone: order.customerPhone,
+                email: order.customerEmail,
+              }
+            : guest,
+          address: usingSavedAddress ? selectedAddr : addr,
+          items: placedItems,
+          total: placedTotal,
+          isGuestOrder: !isLoggedIn,
+          guestCartId: !isLoggedIn ? placedGuestCartId : null,
+        },
+      });
+    } catch (err) {
+      showToast("error", err.message || "Could not place your order.");
+    } finally {
+      setPlacing(false);
+    }
+  };
 
   const shipping = 0;
 
   return (
     <div className="checkout-page">
       <div className="checkout-container">
-
         {/* Header */}
         <div className="checkout-header">
           <h1>Checkout</h1>
@@ -110,10 +181,10 @@ export default function Checkout() {
                 <div
                   className={`checkout-step-circle ${
                     step > s.n
-                      ? 'checkout-step-completed'
+                      ? "checkout-step-completed"
                       : step === s.n
-                      ? 'checkout-step-active'
-                      : 'checkout-step-upcoming'
+                        ? "checkout-step-active"
+                        : "checkout-step-upcoming"
                   }`}
                 >
                   {step > s.n ? (
@@ -138,8 +209,8 @@ export default function Checkout() {
                 <span
                   className={`checkout-step-label ${
                     step === s.n
-                      ? 'checkout-step-label-active'
-                      : 'checkout-step-label-inactive'
+                      ? "checkout-step-label-active"
+                      : "checkout-step-label-inactive"
                   }`}
                 >
                   {s.label}
@@ -150,8 +221,8 @@ export default function Checkout() {
                 <div
                   className={`checkout-step-line ${
                     step > s.n
-                      ? 'checkout-step-line-completed'
-                      : 'checkout-step-line-upcoming'
+                      ? "checkout-step-line-completed"
+                      : "checkout-step-line-upcoming"
                   }`}
                 />
               )}
@@ -160,32 +231,26 @@ export default function Checkout() {
         </div>
 
         <div className="checkout-layout">
-
           {/* Main Content */}
           <div className="checkout-main">
             <div className="checkout-content-card">
-
               {/* Step 1 */}
               {step === 1 && (
                 <div>
                   <h2 className="checkout-section-title">
-                    {isLoggedIn
-                      ? 'Your Information'
-                      : 'Customer Information'}
+                    {isLoggedIn ? "Your Information" : "Customer Information"}
                   </h2>
 
                   {isLoggedIn ? (
                     <div className="checkout-user-box">
                       <div className="checkout-user-avatar">
-                        <span>A</span>
+                        <span>{user?.name?.[0]?.toUpperCase() || "U"}</span>
                       </div>
 
                       <div>
-                        <p className="checkout-user-name">
-                          Alex Johnson
-                        </p>
+                        <p className="checkout-user-name">{user?.name}</p>
                         <p className="checkout-user-contact">
-                          alex@example.com · +1 555 0123
+                          {user?.email} · {user?.phone}
                         </p>
                       </div>
                     </div>
@@ -246,9 +311,7 @@ export default function Checkout() {
               {/* Step 2 */}
               {step === 2 && (
                 <div>
-                  <h2 className="checkout-section-title">
-                    Shipping Address
-                  </h2>
+                  <h2 className="checkout-section-title">Shipping Address</h2>
 
                   {isLoggedIn && addresses.length > 0 ? (
                     <div className="checkout-address-list">
@@ -257,8 +320,8 @@ export default function Checkout() {
                           key={a.id}
                           className={`checkout-address-option ${
                             selectedAddrId === a.id
-                              ? 'checkout-address-selected'
-                              : 'checkout-address-unselected'
+                              ? "checkout-address-selected"
+                              : "checkout-address-unselected"
                           }`}
                         >
                           <input
@@ -266,9 +329,7 @@ export default function Checkout() {
                             name="address"
                             value={a.id}
                             checked={selectedAddrId === a.id}
-                            onChange={() =>
-                              setSelectedAddrId(a.id)
-                            }
+                            onChange={() => setSelectedAddrId(a.id)}
                           />
 
                           <div className="checkout-address-content">
@@ -284,14 +345,11 @@ export default function Checkout() {
 
                             <p>
                               {a.line1}
-                              {a.line2
-                                ? `, ${a.line2}`
-                                : ''}
+                              {a.line2 ? `, ${a.line2}` : ""}
                             </p>
 
                             <p>
-                              {a.city}, {a.state}{' '}
-                              {a.postalCode}
+                              {a.city}, {a.state} {a.postalCode}
                             </p>
 
                             <p>{a.country}</p>
@@ -371,9 +429,7 @@ export default function Checkout() {
                         <div className="checkout-field">
                           <label className="checkout-label">
                             Country
-                            <span className="checkout-required">
-                              *
-                            </span>
+                            <span className="checkout-required">*</span>
                           </label>
 
                           <select
@@ -387,18 +443,15 @@ export default function Checkout() {
                             className="checkout-input checkout-select"
                           >
                             {[
-                              'United States',
-                              'United Kingdom',
-                              'Canada',
-                              'Australia',
-                              'Germany',
-                              'France',
-                              'Other',
+                              "United States",
+                              "United Kingdom",
+                              "Canada",
+                              "Australia",
+                              "Germany",
+                              "France",
+                              "Other",
                             ].map((country) => (
-                              <option
-                                key={country}
-                                value={country}
-                              >
+                              <option key={country} value={country}>
                                 {country}
                               </option>
                             ))}
@@ -431,16 +484,11 @@ export default function Checkout() {
               {/* Step 3 */}
               {step === 3 && (
                 <div>
-                  <h2 className="checkout-section-title">
-                    Review Your Order
-                  </h2>
+                  <h2 className="checkout-section-title">Review Your Order</h2>
 
                   <div className="checkout-review-items">
                     {cart.map(({ product, quantity }) => (
-                      <div
-                        key={product.id}
-                        className="checkout-review-item"
-                      >
+                      <div key={product.id} className="checkout-review-item">
                         <img
                           src={product.images[0]}
                           alt=""
@@ -448,19 +496,14 @@ export default function Checkout() {
                         />
 
                         <div className="checkout-review-details">
-                          <p className="checkout-review-name">
-                            {product.name}
-                          </p>
+                          <p className="checkout-review-name">{product.name}</p>
                           <p className="checkout-review-quantity">
                             Qty: {quantity}
                           </p>
                         </div>
 
                         <span className="checkout-review-price">
-                          $
-                          {(product.price * quantity).toFixed(
-                            2
-                          )}
+                          ${(product.price * quantity).toFixed(2)}
                         </span>
                       </div>
                     ))}
@@ -474,9 +517,7 @@ export default function Checkout() {
 
                     <div>
                       <span>Shipping</span>
-                      <span className="checkout-free">
-                        Free
-                      </span>
+                      <span className="checkout-free">Free</span>
                     </div>
 
                     <div className="checkout-review-total">
@@ -508,9 +549,7 @@ export default function Checkout() {
               {/* Step 4 */}
               {step === 4 && (
                 <div>
-                  <h2 className="checkout-section-title">
-                    Payment Method
-                  </h2>
+                  <h2 className="checkout-section-title">Payment Method</h2>
 
                   <div className="checkout-payment-card">
                     <div className="checkout-radio-circle">
@@ -518,13 +557,11 @@ export default function Checkout() {
                     </div>
 
                     <div className="checkout-payment-content">
-                      <p className="checkout-payment-title">
-                        Cash on Delivery
-                      </p>
+                      <p className="checkout-payment-title">Cash on Delivery</p>
 
                       <p className="checkout-payment-description">
-                        Pay when your order is delivered to
-                        your door. No upfront payment required.
+                        Pay when your order is delivered to your door. No
+                        upfront payment required.
                       </p>
                     </div>
 
@@ -561,9 +598,8 @@ export default function Checkout() {
                     </svg>
 
                     <p>
-                      Please have the exact amount ready when
-                      the delivery arrives. Our courier will
-                      provide a receipt upon delivery.
+                      Please have the exact amount ready when the delivery
+                      arrives. Our courier will provide a receipt upon delivery.
                     </p>
                   </div>
 
@@ -605,9 +641,7 @@ export default function Checkout() {
                         </svg>
                       )}
 
-                      {placing
-                        ? 'Placing Order...'
-                        : 'Place Order'}
+                      {placing ? "Placing Order..." : "Place Order"}
                     </button>
                   </div>
                 </div>
@@ -622,10 +656,7 @@ export default function Checkout() {
 
               <div className="checkout-summary-items">
                 {cart.slice(0, 3).map(({ product, quantity }) => (
-                  <div
-                    key={product.id}
-                    className="checkout-summary-item"
-                  >
+                  <div key={product.id} className="checkout-summary-item">
                     <div className="checkout-summary-image-wrapper">
                       <img
                         src={product.images[0]}
@@ -643,8 +674,7 @@ export default function Checkout() {
                     </p>
 
                     <span className="checkout-summary-product-price">
-                      $
-                      {(product.price * quantity).toFixed(2)}
+                      ${(product.price * quantity).toFixed(2)}
                     </span>
                   </div>
                 ))}
@@ -674,7 +704,6 @@ export default function Checkout() {
               </div>
             </div>
           </div>
-
         </div>
       </div>
     </div>

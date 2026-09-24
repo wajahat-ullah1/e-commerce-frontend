@@ -375,3 +375,83 @@
     height: 44px;
   }
 }
+
+/* Guest → Account creation */
+
+.order-confirmation-account-card {
+  margin-top: 24px;
+  padding: 20px 24px;
+  border: 1px solid #f1f5f9;
+  border-radius: 16px;
+  background: #fff;
+}
+
+.order-confirmation-account-card h3 {
+  margin: 0 0 6px;
+  color: #0f172a;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.order-confirmation-account-card > p {
+  margin: 0 0 16px;
+  color: #64748b;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.order-confirmation-account-prefilled {
+  margin-bottom: 16px;
+  padding: 14px;
+  border-radius: 12px;
+  background: #f8fafc;
+}
+
+.order-confirmation-account-prefilled p {
+  margin: 3px 0;
+  color: #475569;
+  font-size: 14px;
+}
+
+.order-confirmation-account-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.order-confirmation-account-input {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  font-size: 14px;
+  box-sizing: border-box;
+}
+
+.order-confirmation-account-input:focus {
+  outline: none;
+  border-color: #4f46e5;
+}
+
+.order-confirmation-account-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.order-confirmation-account-actions button {
+  flex: 1;
+}
+
+.order-confirmation-account-success {
+  text-align: center;
+  border-color: #d1fae5;
+  background: #f0fdf4;
+}
+
+.order-confirmation-account-success p {
+  margin: 0;
+  color: #166534;
+  font-size: 14px;
+  line-height: 1.5;
+}
