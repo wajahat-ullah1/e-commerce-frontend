@@ -17,6 +17,7 @@ function normalizeAddress(a) {
 
 function toBackendShape(addr) {
   return {
+    label: addr.label || undefined,
     addressLine1: addr.line1,
     addressLine2: addr.line2 || undefined,
     city: addr.city,

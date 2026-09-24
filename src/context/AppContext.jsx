@@ -12,6 +12,7 @@ import { notificationService } from "../services/notificationService";
 import { cartService, guestCartService } from "../services/cartService";
 import { normalizeProduct } from "../services/productService";
 import { addressService } from "../services/addressService";
+import { wishlistService } from "../services/wishlistService";
 
 // ── Context ───────────────────────────────────────────────────────────────────
 
@@ -319,22 +320,49 @@ export function AppProvider({ children }) {
     setCart([]);
   }, []);
 
-  // ── Wishlist ────────────────────────────────────────────────────────────────
+   // ── Wishlist ────────────────────────────────────────────────────────────────
+   
+  const loadWishlist = useCallback(async () => {
+    if (!user) {
+      setWishlist([]);
+      return;
+    }
+    try {
+      const list = await wishlistService.list();
+      setWishlist(list);
+    } catch {
+      setWishlist([]);
+    }
+  }, [user]);
+
+  useEffect(() => {
+    loadWishlist();
+  }, [loadWishlist]);
 
   const wishlistIds = new Set(wishlist.map((p) => p.id));
+
   const toggleWishlist = useCallback(
-    (product) => {
-      setWishlist((prev) => {
-        const exists = prev.some((p) => p.id === product.id);
+    async (product) => {
+      if (!user) {
+        showToast('info', 'Log in to save items to your wishlist.');
+        return;
+      }
+      const exists = wishlist.some((p) => p.id === product.id);
+      try {
         if (exists) {
-          showToast("info", `Removed from wishlist`);
-          return prev.filter((p) => p.id !== product.id);
+          await wishlistService.remove(product.id);
+          setWishlist((prev) => prev.filter((p) => p.id !== product.id));
+          showToast('info', 'Removed from wishlist');
+        } else {
+          await wishlistService.add(product.id);
+          setWishlist((prev) => [...prev, product]);
+          showToast('success', 'Added to wishlist');
         }
-        showToast("success", `Added to wishlist`);
-        return [...prev, product];
-      });
+      } catch (err) {
+        showToast('error', err.message || 'Could not update your wishlist.');
+      }
     },
-    [showToast],
+    [user, wishlist, showToast],
   );
 
   // ── Addresses ───────────────────────────────────────────────────────────────

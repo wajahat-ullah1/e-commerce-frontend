@@ -264,7 +264,11 @@ export function OrderDetail() {
   }, [id]);
 
   const currentIdx = order ? timeline.indexOf(order.status) : -1;
-  const nextStatuses = order ? allowedTransitions[order.status] || [] : [];
+  const nextStatuses = order
+    ? [...(allowedTransitions[order.status] || [])].sort(
+        (a, b) => (a === "RETURNED" ? -1 : 0) - (b === "RETURNED" ? -1 : 0),
+      )
+    : [];
 
   const [selectedStatus, setSelectedStatus] = useState(null);
   const canReturn =

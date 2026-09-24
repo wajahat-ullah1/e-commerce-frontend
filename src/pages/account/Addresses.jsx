@@ -14,6 +14,25 @@ const BLANK = {
   isDefault: false,
 };
 
+function Field({ label, value, onChange, placeholder = '', required = false }) {
+  return (
+    <div className="address-field">
+      <label className="address-field-label">
+        {label}
+        {required && <span className="address-required">*</span>}
+      </label>
+
+      <input
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder={placeholder}
+        required={required}
+        className="address-input"
+      />
+    </div>
+  );
+}
+
 export default function Addresses() {
   const { addresses, addAddress, updateAddress, deleteAddress, setDefaultAddress, showToast } = useApp();
   const [modalOpen, setModalOpen] = useState(false);
@@ -62,21 +81,6 @@ export default function Addresses() {
     }
   };
 
-  const Field = ({ label, value, onChange, placeholder = '', required = false }) => (
-    <div className="address-field">
-      <label className="address-field-label">
-        {label}
-        {required && <span className="address-required">*</span>}
-      </label>
-      <input
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        placeholder={placeholder}
-        required={required}
-        className="address-input"
-      />
-    </div>
-  );
 
   return (
     <div className="addresses-page">

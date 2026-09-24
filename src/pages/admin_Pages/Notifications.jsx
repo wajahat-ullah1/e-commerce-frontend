@@ -111,17 +111,23 @@ export default function Notifications() {
           </p>
         </div>
 
-        {unread > 0 && (
-          <Button variant="secondary" size="sm" onClick={markAll}>
-            <CheckCheck className="notifications-button-icon" />
-            Mark all as read
-          </Button>
-        )}
-        {(notifs || []).length > 0 && (
-          <Button variant="secondary" size="sm" onClick={handleClearAll}>
-            Clear all
-          </Button>
-        )}
+        <div className="notifications-header-actions">
+          {unread > 0 && (
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={markAll}
+            >
+              <CheckCheck className="notifications-button-icon" />
+              Mark all as read
+            </Button>
+          )}
+          {(notifs || []).length > 0 && (
+            <Button variant="secondary" size="sm" onClick={handleClearAll}>
+              Clear all
+            </Button>
+          )}
+        </div>
       </div>
 
       <Card className="notifications-card">

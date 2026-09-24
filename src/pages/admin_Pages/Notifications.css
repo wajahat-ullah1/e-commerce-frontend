@@ -35,6 +35,12 @@
   line-height: 20px;
 }
 
+.notifications-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
 .notifications-button-icon {
   width: 14px;
   height: 14px;
@@ -241,6 +247,37 @@
   font-size: 14px;
   line-height: 20px;
   font-weight: 500;
+}
+
+.notification-delete-button {
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: #9ca3af;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.notification-delete-button:hover {
+  background: #fef2f2;
+  color: #dc2626;
+}
+
+.notification-delete-button:focus-visible {
+  outline: 2px solid #fca5a5;
+  outline-offset: 2px;
+}
+
+.notification-delete-button svg {
+  width: 14px;
+  height: 14px;
 }
 
 /* =========================================================

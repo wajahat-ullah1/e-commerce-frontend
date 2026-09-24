@@ -11,7 +11,6 @@
   gap: 24px;
 }
 
-
 /* =========================================
    Page Header
    ========================================= */
@@ -48,7 +47,6 @@
   line-height: 20px;
 }
 
-
 /* =========================================
    Mark All As Read
    ========================================= */
@@ -74,6 +72,16 @@
   color: #334155;
 }
 
+.notifications-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.notifications-button-icon {
+  width: 14px;
+  height: 14px;
+}
 
 /* =========================================
    Notifications List
@@ -87,7 +95,6 @@
 
   gap: 12px;
 }
-
 
 /* =========================================
    Notification Card
@@ -112,7 +119,6 @@
     border-color 0.2s ease;
 }
 
-
 /* Read Notification */
 
 .notification-read {
@@ -120,14 +126,12 @@
   border: 1px solid #f1f5f9;
 }
 
-
 /* Unread Notification */
 
 .notification-unread {
   background-color: rgba(238, 242, 255, 0.3);
   border: 1px solid #c7d2fe;
 }
-
 
 /* =========================================
    Notification Icon
@@ -146,20 +150,17 @@
   border-radius: 12px;
 }
 
-
 /* Unread Icon Background */
 
 .notification-icon-unread {
   background-color: #e0e7ff;
 }
 
-
 /* Read Icon Background */
 
 .notification-icon-read {
   background-color: #f1f5f9;
 }
-
 
 /* SVG */
 
@@ -168,20 +169,17 @@
   height: 20px;
 }
 
-
 /* Active Icon */
 
 .notification-icon-active {
   color: #4f46e5;
 }
 
-
 /* Inactive Icon */
 
 .notification-icon-inactive {
   color: #94a3b8;
 }
-
 
 /* =========================================
    Notification Content
@@ -192,7 +190,6 @@
 
   min-width: 0;
 }
-
 
 /* =========================================
    Notification Title
@@ -224,7 +221,6 @@
   color: #334155;
 }
 
-
 /* =========================================
    Unread Dot
    ========================================= */
@@ -242,7 +238,6 @@
   background-color: #6366f1;
 }
 
-
 /* =========================================
    Notification Message
    ========================================= */
@@ -255,7 +250,6 @@
   font-size: 14px;
   line-height: 1.625;
 }
-
 
 /* =========================================
    Notification Footer
@@ -280,32 +274,70 @@
   line-height: 16px;
 }
 
-
 /* =========================================
    Mark Read Button
    ========================================= */
 
-.mark-read-btn {
+notification-read-button {
   padding: 0;
-
+  border: 0;
   background: transparent;
-  border: none;
-
-  color: #6366f1;
-
+  color: #9ca3af;
   font-size: 12px;
-  line-height: 16px;
-  font-weight: 500;
-
+  line-height: 18px;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  white-space: nowrap;
   cursor: pointer;
-
-  transition: color 0.2s ease;
+  transition: color 0.15s ease;
 }
 
-.mark-read-btn:hover {
+.notification-read-button:hover {
   color: #4f46e5;
 }
 
+.notification-read-button svg {
+  width: 12px;
+  height: 12px;
+}
+
+/* =========================================
+   Delete Button
+   ========================================= */
+
+.notification-delete-button {
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: #9ca3af;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease;
+}
+
+.notification-delete-button:hover {
+  background: #fef2f2;
+  color: #dc2626;
+}
+
+.notification-delete-button:focus-visible {
+  outline: 2px solid #fca5a5;
+  outline-offset: 2px;
+}
+
+.notification-delete-button svg {
+  width: 14px;
+  height: 14px;
+}
 
 /* =========================================
    Empty State
@@ -352,7 +384,6 @@
   line-height: 20px;
 }
 
-
 /* =========================================
    Responsive Design
    ========================================= */
@@ -380,7 +411,6 @@
     padding: 40px 20px;
   }
 }
-
 
 @media (max-width: 400px) {
   .notifications-header {
@@ -413,7 +443,6 @@
     gap: 8px;
   }
 }
-
 
 /* =========================================
    Print Styles
