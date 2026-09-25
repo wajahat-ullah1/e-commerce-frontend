@@ -100,7 +100,10 @@
   border: 1px solid #e2e8f0;
   border-radius: 0.75rem;
   outline: none;
-  transition: width 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    width 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 .header-search-input:focus {
@@ -162,6 +165,14 @@
   width: 1rem;
   height: 1rem;
   background: #ef4444;
+}
+
+.header-badge--notification {
+  top: -0.25rem;
+  right: -0.25rem;
+  width: 1.25rem;
+  height: 1.25rem;
+  background: #4f46e5;
 }
 
 .header-badge--cart {
@@ -235,7 +246,9 @@
   background: #fff;
   border: 1px solid #f1f5f9;
   border-radius: 1rem;
-  box-shadow: 0 20px 25px -5px rgba(15, 23, 42, 0.1), 0 8px 10px -6px rgba(15, 23, 42, 0.1);
+  box-shadow:
+    0 20px 25px -5px rgba(15, 23, 42, 0.1),
+    0 8px 10px -6px rgba(15, 23, 42, 0.1);
   z-index: 50;
 }
 
