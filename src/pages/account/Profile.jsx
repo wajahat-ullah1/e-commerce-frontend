@@ -156,20 +156,29 @@ export default function Profile() {
         <form onSubmit={handleSave} className="profile-form">
           {fields.map((field) => (
             <div key={field.id} className="profile-field">
-              <label>{field.label}</label>
-
               {editing ? (
-                <input
-                  type={field.type}
-                  value={form[field.id]}
-                  onChange={(e) =>
-                    setForm((prev) => ({ ...prev, [field.id]: e.target.value }))
-                  }
-                />
+                <>
+                  <label htmlFor={field.id}>{field.label}</label>
+                  <input
+                    id={field.id}
+                    name={field.id}
+                    type={field.type}
+                    value={form[field.id]}
+                    onChange={(e) =>
+                      setForm((prev) => ({
+                        ...prev,
+                        [field.id]: e.target.value,
+                      }))
+                    }
+                  />
+                </>
               ) : (
-                <div className="profile-field-value">
-                  {form[field.id] || "—"}
-                </div>
+                <>
+                  <span className="profile-field-label">{field.label}</span>
+                  <div className="profile-field-value">
+                    {form[field.id] || "—"}
+                  </div>
+                </>
               )}
             </div>
           ))}

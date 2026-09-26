@@ -10,6 +10,7 @@ import {
 } from "../../components/admin_Ui/Ui";
 import { useFetch } from "../../hooks/useFetch";
 import { orderService } from "../../services/orderService";
+import { productService } from "../../services/productService";
 import { useApp } from "../../context/useApp";
 import "./Orders.css";
 
@@ -225,6 +226,7 @@ export function OrderDetail() {
   const { showToast } = useApp();
 
   const [order, setOrder] = useState(null);
+  const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showConfirm, setShowConfirm] = useState(false);
   const [updating, setUpdating] = useState(false);
@@ -259,8 +261,20 @@ export function OrderDetail() {
       .finally(() => setLoading(false));
   };
 
+  // useEffect(() => {
+
+  // }, [id]);
+
   useEffect(() => {
     loadOrder();
+    productService
+      .get(id)
+      .then((p) => {
+        setProduct(p);
+        setActiveImage(0);
+      })
+      .catch((err) => showToast("error", err.message))
+      .finally(() => setLoading(false));
   }, [id]);
 
   const currentIdx = order ? timeline.indexOf(order.status) : -1;
@@ -371,10 +385,10 @@ export function OrderDetail() {
             <div className="order-card-header">
               <h2 className="order-section-title">Order Items</h2>
             </div>
-            {order.items.map((item) => (
+                        {order.items.map((item) => (
               <div key={item.id} className="order-item">
                 <img
-                  src={item.product?.image}
+                  src={item.product?.images?.[0]?.url}
                   alt={item.product?.name}
                   className="order-item-image"
                 />

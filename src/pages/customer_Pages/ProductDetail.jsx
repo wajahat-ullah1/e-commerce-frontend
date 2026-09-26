@@ -1,36 +1,33 @@
-import { useState, useEffect, useMemo } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
-import { productService } from '../../services/productService';
-import { reviewService } from '../../services/reviewService';
-import { useApp } from '../../context/useApp';
-import Breadcrumb from '../../components/customer_Ui/Breadcrumb';
-import Rating, { StarSelector } from '../../components/customer_Ui/Rating';
-import { StockBadge } from '../../components/customer_Ui/Badge';
-import QuantitySelector from '../../components/customer_Ui/QuantitySelector';
-import ProductCard from '../../components/customer_Ui/ProductCard';
-import Modal from '../../components/customer_Ui/Modal';
-import './ProductDetail.css';
+import { useState, useEffect, useMemo } from "react";
+import { useParams, Link, useNavigate } from "react-router-dom";
+import { productService } from "../../services/productService";
+import { reviewService } from "../../services/reviewService";
+import { useApp } from "../../context/useApp";
+import Breadcrumb from "../../components/customer_Ui/Breadcrumb";
+import Rating, { StarSelector } from "../../components/customer_Ui/Rating";
+import { StockBadge } from "../../components/customer_Ui/Badge";
+import QuantitySelector from "../../components/customer_Ui/QuantitySelector";
+import ProductCard from "../../components/customer_Ui/ProductCard";
+import Modal from "../../components/customer_Ui/Modal";
+import "./ProductDetail.css";
 
-function initials(name = '') {
-  return name
-    .trim()
-    .split(/\s+/)
-    .slice(0, 2)
-    .map((w) => w[0])
-    .join('') || '?';
+function initials(name = "") {
+  return (
+    name
+      .trim()
+      .split(/\s+/)
+      .slice(0, 2)
+      .map((w) => w[0])
+      .join("") || "?"
+  );
 }
 
 export default function ProductDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
 
-  const {
-    addToCart,
-    toggleWishlist,
-    wishlistIds,
-    showToast,
-    isLoggedIn,
-  } = useApp();
+  const { addToCart, toggleWishlist, wishlistIds, showToast, isLoggedIn } =
+    useApp();
 
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -43,10 +40,10 @@ export default function ProductDetail() {
   const [qty, setQty] = useState(1);
   const [reviewModal, setReviewModal] = useState(false);
   const [reviewRating, setReviewRating] = useState(5);
-  const [reviewText, setReviewText] = useState('');
+  const [reviewText, setReviewText] = useState("");
   const [reviewSubmitting, setReviewSubmitting] = useState(false);
   const [reviewSubmitted, setReviewSubmitted] = useState(false);
-  const [activeTab, setActiveTab] = useState('description');
+  const [activeTab, setActiveTab] = useState("description");
 
   // Load the product itself.
   useEffect(() => {
@@ -122,7 +119,7 @@ export default function ProductDetail() {
             : 0,
         };
       }),
-    [productReviews]
+    [productReviews],
   );
 
   if (loading) {
@@ -137,9 +134,7 @@ export default function ProductDetail() {
 
           <h2>Product Not Found</h2>
 
-          <p>
-            This product doesn't exist or has been removed.
-          </p>
+          <p>This product doesn't exist or has been removed.</p>
 
           <Link to="/shop" className="product-detail-back-btn">
             Back to Shop
@@ -157,7 +152,7 @@ export default function ProductDetail() {
 
   const handleBuyNow = () => {
     addToCart(product, qty);
-    navigate('/checkout');
+    navigate("/checkout");
   };
 
   const handleReviewSubmit = async (e) => {
@@ -180,43 +175,42 @@ export default function ProductDetail() {
       setTimeout(() => {
         setReviewModal(false);
         setReviewSubmitted(false);
-        setReviewText('');
+        setReviewText("");
         setReviewRating(5);
       }, 2000);
 
-      showToast('success', 'Review submitted successfully!');
+      showToast("success", "Review submitted successfully!");
     } catch (err) {
-      showToast('error', err.message);
+      showToast("error", err.message);
     } finally {
       setReviewSubmitting(false);
     }
   };
 
-  const tabs = ['description', 'shipping', 'returns'];
+  const tabs = ["description", "shipping", "returns"];
 
   const trustIndicators = [
     {
-      icon: 'M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z',
-      label: 'Secure Checkout',
+      icon: "M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z",
+      label: "Secure Checkout",
     },
     {
-      icon: 'M13 10V3L4 14h7v7l9-11h-7z',
-      label: 'Fast Delivery',
+      icon: "M13 10V3L4 14h7v7l9-11h-7z",
+      label: "Fast Delivery",
     },
     {
-      icon: 'M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z',
-      label: 'Quality Guaranteed',
+      icon: "M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z",
+      label: "Quality Guaranteed",
     },
   ];
 
   return (
     <div className="product-detail-page">
       <div className="product-detail-container">
-
         <Breadcrumb
           crumbs={[
-            { label: 'Home', to: '/' },
-            { label: 'Shop', to: '/shop' },
+            { label: "Home", to: "/" },
+            { label: "Shop", to: "/shop" },
             {
               label: product.category,
               to: `/shop?category=${product.categoryId}`,
@@ -226,7 +220,6 @@ export default function ProductDetail() {
         />
 
         <div className="product-detail-main">
-
           {/* Image Gallery — admins can post several angles of the same
               product; the first one they set as primary shows by default
               and the rest are browsable as thumbnails. */}
@@ -251,8 +244,8 @@ export default function ProductDetail() {
                     onClick={() => setSelectedImage(i)}
                     className={`product-thumbnail ${
                       selectedImage === i
-                        ? 'product-thumbnail-active'
-                        : 'product-thumbnail-inactive'
+                        ? "product-thumbnail-active"
+                        : "product-thumbnail-inactive"
                     }`}
                   >
                     <img src={img} alt="" />
@@ -264,14 +257,9 @@ export default function ProductDetail() {
 
           {/* Product Info */}
           <div className="pdp-info">
+            <span className="product-category">{product.category}</span>
 
-            <span className="product-category">
-              {product.category}
-            </span>
-
-            <h1 className="product-title">
-              {product.name}
-            </h1>
+            <h1 className="product-title">{product.name}</h1>
 
             <div className="product-rating">
               <Rating
@@ -283,9 +271,7 @@ export default function ProductDetail() {
             </div>
 
             <div className="product-price-row">
-              <span className="product-price">
-                ${product.price.toFixed(2)}
-              </span>
+              <span className="product-price">{product.price.toFixed(2)}</span>
             </div>
 
             <div className="product-stock-section">
@@ -300,11 +286,8 @@ export default function ProductDetail() {
 
             {/* Quantity + Actions */}
             <div className="product-actions-section">
-
               <div className="product-quantity-row">
-                <span className="product-quantity-label">
-                  Qty:
-                </span>
+                <span className="product-quantity-label">Qty:</span>
 
                 <QuantitySelector
                   value={qty}
@@ -314,15 +297,12 @@ export default function ProductDetail() {
               </div>
 
               <div className="product-action-buttons">
-
                 <button
                   onClick={handleAddToCart}
                   disabled={product.stock === 0}
                   className="product-add-cart-btn"
                 >
-                  {product.stock === 0
-                    ? 'Out of Stock'
-                    : 'Add to Cart'}
+                  {product.stock === 0 ? "Out of Stock" : "Add to Cart"}
                 </button>
 
                 <button
@@ -337,15 +317,15 @@ export default function ProductDetail() {
                   onClick={() => toggleWishlist(product)}
                   className={`product-wishlist-btn ${
                     inWishlist
-                      ? 'product-wishlist-active'
-                      : 'product-wishlist-inactive'
+                      ? "product-wishlist-active"
+                      : "product-wishlist-inactive"
                   }`}
                   aria-label="Toggle wishlist"
                 >
                   <svg
                     width="20"
                     height="20"
-                    fill={inWishlist ? 'currentColor' : 'none'}
+                    fill={inWishlist ? "currentColor" : "none"}
                     stroke="currentColor"
                     viewBox="0 0 24 24"
                   >
@@ -357,17 +337,13 @@ export default function ProductDetail() {
                     />
                   </svg>
                 </button>
-
               </div>
             </div>
 
             {/* Trust Indicators */}
             <div className="trust-indicators">
               {trustIndicators.map((item) => (
-                <div
-                  key={item.label}
-                  className="trust-indicator"
-                >
+                <div key={item.label} className="trust-indicator">
                   <svg
                     width="20"
                     height="20"
@@ -375,10 +351,7 @@ export default function ProductDetail() {
                     stroke="currentColor"
                     viewBox="0 0 24 24"
                   >
-                    <path
-                      strokeWidth={1.8}
-                      d={item.icon}
-                    />
+                    <path strokeWidth={1.8} d={item.icon} />
                   </svg>
 
                   <span>{item.label}</span>
@@ -388,7 +361,6 @@ export default function ProductDetail() {
 
             {/* Tabs */}
             <div className="product-tabs">
-
               <div className="product-tab-buttons">
                 {tabs.map((tab) => (
                   <button
@@ -396,8 +368,8 @@ export default function ProductDetail() {
                     onClick={() => setActiveTab(tab)}
                     className={`product-tab-button ${
                       activeTab === tab
-                        ? 'product-tab-active'
-                        : 'product-tab-inactive'
+                        ? "product-tab-active"
+                        : "product-tab-inactive"
                     }`}
                   >
                     {tab}
@@ -406,62 +378,75 @@ export default function ProductDetail() {
               </div>
 
               <div className="product-tab-content">
+                {activeTab === "description" && <p>{product.description}</p>}
 
-                {activeTab === 'description' && (
-                  <p>{product.description}</p>
-                )}
-
-                {activeTab === 'shipping' && (
+                {activeTab === "shipping" && (
                   <div className="product-tab-text">
                     <p>
-                      <strong>Standard Delivery:</strong>{' '}
-                      3-5 business days — Free on all orders
+                      <strong>Standard Delivery:</strong> 3-5 business days —
+                      Free on all orders
                     </p>
 
                     <p>
-                      <strong>Express Delivery:</strong>{' '}
-                      1-2 business days — $9.99
+                      <strong>Express Delivery:</strong> 1-2 business days — 500
+                      Rs Charges.
                     </p>
 
                     <p>
-                      Orders placed before 2pm are shipped the
-                      same business day.
+                      Orders placed before 2pm are shipped the same business
+                      day.
                     </p>
                   </div>
                 )}
 
-                {activeTab === 'returns' && (
+                {activeTab === "returns" && (
                   <div className="product-tab-text">
+                    <h3>
+                      <strong>DELIVERY POLICY</strong>
+                    </h3>
                     <p>
-                      <strong>30-Day Returns:</strong>{' '}
-                      Return or exchange any item within 30 days
-                      of delivery.
+                      We deliver our products{" "}
+                      <strong>all across Pakistan</strong> with our{" "}
+                      <strong>Open Box Delivery service</strong>. This allows
+                      you to check your order when it arrives before accepting
+                      it. We aim to make every delivery safe, convenient, and
+                      worry-free for our customers.
+                    </p>
+                    <h3>Return & Refund</h3>
+                    <p>
+                      If you are not satisfied with your purchase or receive a
+                      product that qualifies for a return, you can request a
+                      return according to our return policy.
+                    </p>
+                    <h3>For Return:</h3>
+                    <p>
+                      After your return request is approved, the product will be
+                      collected and sent back to our warehouse. Once we receive
+                      and inspect the returned product, your eligible refund
+                      will be processed.
                     </p>
 
+                    <h3>For Exchange:</h3>
                     <p>
-                      Items must be unused and in original
-                      packaging. Free return shipping included.
+                      If your exchange request is approved, our rider will
+                      deliver the replacement product to your doorstep and
+                      collect the original product at the same time.
                     </p>
                   </div>
                 )}
-
               </div>
             </div>
-
           </div>
         </div>
 
         {/* Reviews */}
         <section className="product-reviews-section">
-
           <div className="reviews-header">
             <h2>Customer Reviews</h2>
 
             <button
               onClick={() =>
-                isLoggedIn
-                  ? setReviewModal(true)
-                  : navigate('/login')
+                isLoggedIn ? setReviewModal(true) : navigate("/login")
               }
               className="write-review-btn"
             >
@@ -470,13 +455,9 @@ export default function ProductDetail() {
           </div>
 
           <div className="reviews-grid">
-
             {/* Summary */}
             <div className="review-summary">
-
-              <div className="review-average">
-                {product.rating.toFixed(1)}
-              </div>
+              <div className="review-average">{product.rating.toFixed(1)}</div>
 
               <div className="review-summary-rating">
                 <Rating value={product.rating} size="lg" />
@@ -488,13 +469,8 @@ export default function ProductDetail() {
 
               <div className="rating-distribution">
                 {ratingDist.map(({ star, count, pct }) => (
-                  <div
-                    key={star}
-                    className="rating-distribution-row"
-                  >
-                    <span className="rating-star-label">
-                      {star}★
-                    </span>
+                  <div key={star} className="rating-distribution-row">
+                    <span className="rating-star-label">{star}★</span>
 
                     <div className="rating-progress">
                       <div
@@ -503,64 +479,59 @@ export default function ProductDetail() {
                       />
                     </div>
 
-                    <span className="rating-count">
-                      {count}
-                    </span>
+                    <span className="rating-count">{count}</span>
                   </div>
                 ))}
               </div>
-
             </div>
 
             {/* Review List */}
             <div className="review-list">
-
               {productReviews.length === 0 ? (
                 <div className="no-reviews">
                   <p>No reviews yet</p>
-                  <span>
-                    Be the first to share your experience
-                  </span>
+                  <span>Be the first to share your experience</span>
                 </div>
               ) : (
                 productReviews.map((review) => (
-                  <div
-                    key={review.id}
-                    className="review-card"
-                  >
+                  <div key={review.id} className="review-card">
                     <div className="review-card-header">
-
-                      <div className="review-avatar-initials">
-                        {initials(review.user?.name)}
-                      </div>
+                      {review.user?.profileImage ? (
+                        <img
+                          src={review.user.profileImage}
+                          alt={review.user.name}
+                          className="review-avatar-image"
+                        />
+                      ) : (
+                        <div className="review-avatar-initials">
+                          {initials(review.user?.name)}
+                        </div>
+                      )}
 
                       <div className="review-author-info">
-                        <p>{review.user?.name || 'Anonymous'}</p>
+                        <p>{review.user?.name || "Anonymous"}</p>
 
                         <span>
-                          {new Date(
-                            review.createdAt
-                          ).toLocaleDateString('en-US', {
-                            year: 'numeric',
-                            month: 'long',
-                            day: 'numeric',
-                          })}
+                          {new Date(review.createdAt).toLocaleDateString(
+                            "en-US",
+                            {
+                              year: "numeric",
+                              month: "long",
+                              day: "numeric",
+                            },
+                          )}
                         </span>
                       </div>
 
                       <div className="review-card-rating">
                         <Rating value={review.rating} />
                       </div>
-
                     </div>
 
-                    <p className="review-text">
-                      {review.comment}
-                    </p>
+                    <p className="review-text">{review.comment}</p>
                   </div>
                 ))
               )}
-
             </div>
           </div>
         </section>
@@ -568,21 +539,15 @@ export default function ProductDetail() {
         {/* Related Products */}
         {related.length > 0 && (
           <section className="related-products-section">
-
             <h2>Related Products</h2>
 
             <div className="related-products-grid">
               {related.map((item) => (
-                <ProductCard
-                  key={item.id}
-                  product={item}
-                />
+                <ProductCard key={item.id} product={item} />
               ))}
             </div>
-
           </section>
         )}
-
       </div>
 
       {/* Write Review Modal */}
@@ -592,10 +557,8 @@ export default function ProductDetail() {
         title="Write a Review"
       >
         <div className="review-modal-content">
-
           {reviewSubmitted ? (
             <div className="review-success">
-
               <div className="review-success-icon">
                 <svg
                   width="24"
@@ -615,41 +578,23 @@ export default function ProductDetail() {
 
               <p>Review submitted!</p>
 
-              <span>
-                Thank you for your feedback.
-              </span>
-
+              <span>Thank you for your feedback.</span>
             </div>
           ) : (
-            <form
-              onSubmit={handleReviewSubmit}
-              className="review-form"
-            >
-
+            <form onSubmit={handleReviewSubmit} className="review-form">
               <div className="review-product-preview">
-
-                <img
-                  src={product.images[0]}
-                  alt=""
-                />
+                <img src={product.images[0]} alt="" />
 
                 <p>{product.name}</p>
-
               </div>
 
               <div className="review-form-field">
-
                 <label>Your Rating</label>
 
-                <StarSelector
-                  value={reviewRating}
-                  onChange={setReviewRating}
-                />
-
+                <StarSelector value={reviewRating} onChange={setReviewRating} />
               </div>
 
               <div className="review-form-field">
-
                 <label>Your Review</label>
 
                 <textarea
@@ -659,12 +604,11 @@ export default function ProductDetail() {
                   rows={4}
                   placeholder="Share your experience with this product..."
                 />
-
               </div>
 
               <p className="review-form-note">
-                You can only review products from orders that have
-                been delivered to you.
+                You can only review products from orders that have been
+                delivered to you.
               </p>
 
               <button
@@ -672,12 +616,10 @@ export default function ProductDetail() {
                 disabled={reviewSubmitting}
                 className="submit-review-btn"
               >
-                {reviewSubmitting ? 'Submitting…' : 'Submit Review'}
+                {reviewSubmitting ? "Submitting…" : "Submit Review"}
               </button>
-
             </form>
           )}
-
         </div>
       </Modal>
     </div>

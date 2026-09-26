@@ -98,12 +98,12 @@ export default function OrderDetail() {
         <Breadcrumb
           crumbs={[
             { label: "My Orders", to: "/account/orders" },
-            { label: `#${order.orderNumber}` },
+            { label: `ORD-${order.orderNumber}` },
           ]}
         />
 
         <div className="order-title-row">
-          <h1>Order #{order.orderNumber}</h1>
+          <h1>Order ORD-{order.orderNumber}</h1>
           <OrderStatusBadge status={order.status} />
         </div>
 
@@ -232,12 +232,12 @@ export default function OrderDetail() {
                 <div className="order-item-info">
                   <p className="order-item-name">{item.name}</p>
                   <p className="order-item-details">
-                    Qty: {item.quantity} × ${item.price.toFixed(2)}
+                    Qty: {item.quantity} × {item.price.toFixed(2)}
                   </p>
                 </div>
 
                 <span className="order-item-total">
-                  ${(item.price * item.quantity).toFixed(2)}
+                  {(item.price * item.quantity).toFixed(2)}
                 </span>
               </div>
             ))}
@@ -246,7 +246,7 @@ export default function OrderDetail() {
           <div className="order-summary">
             <div className="order-summary-row">
               <span>Subtotal</span>
-              <span>${order.subtotal.toFixed(2)}</span>
+              <span>{order.subtotal.toFixed(2)}</span>
             </div>
 
             <div className="order-summary-row">
@@ -256,7 +256,7 @@ export default function OrderDetail() {
 
             <div className="order-total-row">
               <span>Total</span>
-              <span>${order.total.toFixed(2)}</span>
+              <span>{order.total.toFixed(2)}</span>
             </div>
           </div>
         </div>

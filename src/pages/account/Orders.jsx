@@ -93,7 +93,7 @@ export default function Orders() {
             <div key={order.id} className="order-card">
               <div className="order-card-header">
                 <div className="order-card-number-section">
-                  <p className="order-card-number">#{order.orderNumber}</p>
+                  <p className="order-card-number">ORD-{order.orderNumber}</p>
                   <p className="order-card-date">
                     {new Date(order.date).toLocaleDateString("en-US", {
                       year: "numeric",
@@ -127,7 +127,7 @@ export default function Orders() {
                     {order.items.length} item{order.items.length > 1 ? "s" : ""}{" "}
                     · {order.paymentMethod}
                   </p>
-                  <p className="order-total">${order.total.toFixed(2)}</p>
+                  <p className="order-total">{order.total.toFixed(2)}</p>
                 </div>
 
                 <Link

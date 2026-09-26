@@ -98,9 +98,9 @@ export default function ProductCard({ product, view = 'grid' }) {
         </div>
         <div className={styles.gridFooterRow}>
           <div>
-            <span className={styles.priceSmall}>${product.price.toFixed(2)}</span>
+            <span className={styles.priceSmall}>{product.price.toFixed(2)}</span>
             {product.originalPrice && (
-              <span className={styles.originalPriceSmall}>${product.originalPrice.toFixed(2)}</span>
+              <span className={styles.originalPriceSmall}>{product.originalPrice.toFixed(2)}</span>
             )}
           </div>
           <button

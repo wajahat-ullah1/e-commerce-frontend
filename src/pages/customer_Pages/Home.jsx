@@ -249,8 +249,10 @@ export default function Home() {
           ) : (
             <form onSubmit={handleSubscribe} className={styles.newsletterForm}>
               <input
+                id='email'
                 type="email"
                 required
+                autoComplete='email'
                 value={email}
                 onChange={e => setEmail(e.target.value)}
                 placeholder="Your email address"

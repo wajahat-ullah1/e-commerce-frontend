@@ -212,6 +212,7 @@ export default function Shop() {
         <div className="shop-price-inputs">
           <input
             type="number"
+            id="startprice"
             value={priceRange[0]}
             onChange={(e) => {
               setPage(1);
@@ -225,6 +226,7 @@ export default function Shop() {
 
           <input
             type="number"
+            id="nndprice"
             value={priceRange[1]}
             onChange={(e) => {
               setPage(1);
@@ -383,6 +385,7 @@ export default function Shop() {
 
               {/* Sort */}
               <select
+                id="option"
                 value={sort}
                 onChange={(e) => {
                   setSort(e.target.value);

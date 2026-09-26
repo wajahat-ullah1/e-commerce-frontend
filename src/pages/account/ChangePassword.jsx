@@ -116,9 +116,13 @@ export default function ChangePassword() {
 
         <form onSubmit={handleSubmit} className="change-password-form">
           <div className="password-field">
-            <label className="password-field-label">Current Password</label>
+            <label className="password-field-label" htmlFor="current-password">
+              Current Password
+            </label>
             <div className="password-input-wrapper">
               <input
+                id="current-password"
+                name="currentPassword"
                 type={show.current ? "text" : "password"}
                 value={form.current}
                 onChange={(e) =>
@@ -136,9 +140,10 @@ export default function ChangePassword() {
           </div>
 
           <div className="password-field">
-            <label className="password-field-label">New Password</label>
+            <label className="password-field-label" htmlFor="new-password">New Password</label>
             <div className="password-input-wrapper">
               <input
+                id="new-password"
                 type={show.newPwd ? "text" : "password"}
                 value={form.newPwd}
                 onChange={(e) =>
@@ -172,9 +177,10 @@ export default function ChangePassword() {
           </div>
 
           <div className="password-field">
-            <label className="password-field-label">Confirm New Password</label>
+            <label className="password-field-label" htmlFor="confirm-password">Confirm New Password</label>
             <div className="password-input-wrapper">
               <input
+                id="confirm-password"
                 type={show.confirm ? "text" : "password"}
                 value={form.confirm}
                 onChange={(e) =>
