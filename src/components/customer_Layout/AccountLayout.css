@@ -2,13 +2,13 @@
 
 .account-layout {
   min-height: 100vh;
-  background: #f8fafc;
+  background: #f7f6fb;
 }
 
 .account-container {
   max-width: 80rem;
   margin: 0 auto;
-  padding: 2rem 1rem;
+  padding: 2.5rem 1rem;
 }
 
 .account-main {
@@ -25,9 +25,10 @@
 .account-profile-card {
   margin-bottom: 1rem;
   padding: 1.25rem;
-  background: #fff;
-  border: 1px solid #f1f5f9;
-  border-radius: 1rem;
+  background: #ffffff;
+  border: 1px solid rgba(124, 58, 237, 0.12);
+  border-radius: 1.25rem;
+  box-shadow: 0 2px 10px rgba(24, 16, 31, 0.05);
 }
 
 .account-profile-row {
@@ -42,21 +43,21 @@
   flex-shrink: 0;
   border-radius: 50%;
   object-fit: cover;
-  border: 2px solid #e0e7ff;
+  border: 2px solid #ede9fe;
 }
 
 .account-profile-avatar--fallback {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #e0e7ff;
+  background: linear-gradient(135deg, #7c3aed, #c026d3);
   border: 0;
 }
 
 .account-profile-avatar--fallback span {
-  color: #4f46e5;
+  color: #fff;
   font-size: 1.125rem;
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .account-profile-info {
@@ -72,22 +73,23 @@
 }
 
 .account-profile-name {
-  color: #0f172a;
+  color: #1a1225;
   font-size: 0.875rem;
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .account-profile-email {
   margin-top: 0.125rem;
-  color: #94a3b8;
+  color: #8888a0;
   font-size: 0.75rem;
 }
 
 .account-nav {
   overflow: hidden;
-  background: #fff;
-  border: 1px solid #f1f5f9;
-  border-radius: 1rem;
+  background: #ffffff;
+  border: 1px solid rgba(124, 58, 237, 0.12);
+  border-radius: 1.25rem;
+  box-shadow: 0 2px 10px rgba(24, 16, 31, 0.05);
 }
 
 .account-nav-badge {
@@ -96,7 +98,7 @@
   height: 1.25rem;
   padding: 0 0.35rem;
   border-radius: 9999px;
-  background: #4f46e5;
+  background: linear-gradient(135deg, #7c3aed, #c026d3);
   color: #fff;
   font-size: 0.7rem;
   font-weight: 700;
@@ -111,17 +113,21 @@
   align-items: center;
   gap: 0.75rem;
   width: 100%;
-  padding: 0.75rem 1rem;
+  padding: 0.75rem 1.1rem;
   font-size: 0.875rem;
-  font-weight: 500;
+  font-weight: 600;
   text-decoration: none;
-  transition: background 0.2s ease, color 0.2s ease;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    box-shadow 0.2s ease;
   box-sizing: border-box;
 }
 
 .account-nav-link {
-  color: #334155;
-  border-bottom: 1px solid #f8fafc;
+  position: relative;
+  color: #4b4b5e;
+  border-bottom: 1px solid #f4f2f9;
 }
 
 .account-nav-link:last-of-type {
@@ -129,23 +135,24 @@
 }
 
 .account-nav-link:hover {
-  background: #f8fafc;
+  background: rgba(124, 58, 237, 0.05);
 }
 
 .account-nav-link.is-active {
-  color: #4f46e5;
-  background: #eef2ff;
+  color: #7c3aed;
+  background: rgba(124, 58, 237, 0.07);
+  box-shadow: inset 3px 0 0 0 #7c3aed;
 }
 
 .account-nav-icon {
   width: 1rem;
   height: 1rem;
   flex-shrink: 0;
-  color: #94a3b8;
+  color: #a3a3b8;
 }
 
 .account-nav-icon.is-active {
-  color: #4f46e5;
+  color: #7c3aed;
 }
 
 .account-logout {
@@ -153,12 +160,12 @@
   text-align: left;
   background: transparent;
   border: 0;
-  border-top: 1px solid #f1f5f9;
+  border-top: 1px solid rgba(124, 58, 237, 0.1);
   cursor: pointer;
 }
 
 .account-logout:hover {
-  background: #fef2f2;
+  background: rgba(239, 68, 68, 0.06);
 }
 
 .account-content {
@@ -176,9 +183,12 @@
 @media (min-width: 1024px) {
   .account-main {
     flex-direction: row;
+    align-items: flex-start;
   }
 
   .account-sidebar {
     width: 16rem;
+    position: sticky;
+    top: 5.5rem;
   }
 }

@@ -4,13 +4,10 @@
 
 .order-detail-page {
   width: 100%;
-
   display: flex;
   flex-direction: column;
-
   gap: 24px;
 }
-
 
 /* =========================================
    Order Header
@@ -20,35 +17,37 @@
   width: 100%;
 }
 
+.order-detail-header-card {
+  box-sizing: border-box;
+  padding: 20px;
+  background-color: #ffffff;
+  border: 1px solid rgba(124, 58, 237, 0.12);
+  border-radius: 1.25rem;
+  box-shadow: 0 2px 10px rgba(24, 16, 31, 0.05);
+}
+
 .order-title-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
-
   gap: 16px;
-
   margin-top: 12px;
 }
 
 .order-title-row h1 {
   margin: 0;
-
-  color: #0f172a;
-
+  color: #1a1225;
   font-size: 24px;
   line-height: 32px;
-  font-weight: 700;
+  font-weight: 800;
 }
 
 .order-date {
   margin: 4px 0 0;
-
-  color: #94a3b8;
-
+  color: #a3a3b8;
   font-size: 14px;
   line-height: 20px;
 }
-
 
 /* =========================================
    Order Timeline Card
@@ -56,27 +55,21 @@
 
 .order-timeline-card {
   width: 100%;
-
   box-sizing: border-box;
-
   padding: 20px;
-
   background-color: #ffffff;
-
-  border: 1px solid #f1f5f9;
-  border-radius: 16px;
+  border: 1px solid rgba(124, 58, 237, 0.12);
+  border-radius: 1.25rem;
+  box-shadow: 0 2px 10px rgba(24, 16, 31, 0.05);
 }
 
 .order-timeline-card h2 {
   margin: 0 0 24px;
-
-  color: #0f172a;
-
+  color: #1a1225;
   font-size: 16px;
   line-height: 24px;
-  font-weight: 600;
+  font-weight: 700;
 }
-
 
 /* =========================================
    Timeline
@@ -84,9 +77,7 @@
 
 .timeline {
   position: relative;
-
   width: 100%;
-
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
@@ -94,44 +85,31 @@
 
 .timeline-line {
   position: absolute;
-
   top: 16px;
   left: 0;
   right: 0;
-
   height: 2px;
-
-  margin-left: 32px;
-  margin-right: 32px;
-
-  background-color: #f1f5f9;
+  margin-left: 10%;
+  margin-right: 10%;
+  background-color: #f1eef8;
 }
 
 .timeline-progress {
   position: absolute;
-
   top: 16px;
-  left: 0;
-
+  left: 10%;
   height: 2px;
-
-  margin-left: 32px;
-
-  background-color: #6366f1;
-
+  background-image: linear-gradient(90deg, #7c3aed, #c026d3);
   transition: width 0.3s ease;
 }
 
 .timeline-item {
   position: relative;
-
   z-index: 10;
-
   display: flex;
   flex-direction: column;
   align-items: center;
 }
-
 
 /* =========================================
    Timeline Circle
@@ -140,53 +118,45 @@
 .timeline-circle {
   width: 32px;
   height: 32px;
-
   box-sizing: border-box;
-
   display: flex;
   align-items: center;
   justify-content: center;
-
   border: 2px solid;
-
   border-radius: 50%;
-
   transition:
     background-color 0.2s ease,
+    background-image 0.2s ease,
     border-color 0.2s ease,
     box-shadow 0.2s ease;
 }
 
 .timeline-circle-done {
-  background-color: #4f46e5;
-  border-color: #4f46e5;
+  background-image: linear-gradient(135deg, #7c3aed, #c026d3);
+  border-color: transparent;
 }
 
 .timeline-circle-pending {
   background-color: #ffffff;
-  border-color: #e2e8f0;
+  border-color: #e5def2;
 }
 
 .timeline-circle-active {
-  box-shadow: 0 0 0 4px #e0e7ff;
+  box-shadow: 0 0 0 4px rgba(124, 58, 237, 0.15);
 }
 
 .timeline-check-icon {
   width: 16px;
   height: 16px;
-
   color: #ffffff;
 }
 
 .timeline-dot {
   width: 8px;
   height: 8px;
-
   border-radius: 50%;
-
-  background-color: #cbd5e1;
+  background-color: #d1cbe0;
 }
-
 
 /* =========================================
    Timeline Text
@@ -194,33 +164,27 @@
 
 .timeline-status {
   margin: 8px 0 0;
-
   font-size: 12px;
   line-height: 16px;
-  font-weight: 500;
-
+  font-weight: 600;
   text-align: center;
 }
 
 .timeline-status-done {
-  color: #4f46e5;
+  color: #7c3aed;
 }
 
 .timeline-status-pending {
-  color: #94a3b8;
+  color: #a3a3b8;
 }
 
 .timeline-date {
   margin: 2px 0 0;
-
-  color: #cbd5e1;
-
+  color: #c3bcd6;
   font-size: 10px;
   line-height: 14px;
-
   text-align: center;
 }
-
 
 /* =========================================
    Cancelled Notice
@@ -228,50 +192,37 @@
 
 .cancelled-notice {
   width: 100%;
-
   box-sizing: border-box;
-
   display: flex;
   align-items: center;
-
   gap: 12px;
-
   padding: 20px;
-
   background-color: #fef2f2;
-
-  border: 1px solid #fecaca;
-  border-radius: 16px;
+  border: 1px solid #fecdd3;
+  border-radius: 1.25rem;
 }
 
 .cancelled-icon {
   width: 20px;
   height: 20px;
-
   flex-shrink: 0;
-
-  color: #ef4444;
+  color: #e11d48;
 }
 
 .cancelled-title {
   margin: 0;
-
-  color: #991b1b;
-
+  color: #9f1239;
   font-size: 16px;
   line-height: 24px;
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .cancelled-description {
   margin: 0;
-
   color: #dc2626;
-
   font-size: 14px;
   line-height: 20px;
 }
-
 
 /* =========================================
    Main Content Grid
@@ -279,16 +230,12 @@
 
 .order-content-grid {
   display: grid;
-
   grid-template-columns:
     minmax(0, 2fr)
     minmax(0, 1fr);
-
   gap: 24px;
-
   width: 100%;
 }
-
 
 /* =========================================
    Order Items Card
@@ -296,25 +243,20 @@
 
 .order-items-card {
   box-sizing: border-box;
-
   padding: 20px;
-
   background-color: #ffffff;
-
-  border: 1px solid #f1f5f9;
-  border-radius: 16px;
+  border: 1px solid rgba(124, 58, 237, 0.12);
+  border-radius: 1.25rem;
+  box-shadow: 0 2px 10px rgba(24, 16, 31, 0.05);
 }
 
 .order-items-card h2 {
   margin: 0 0 16px;
-
-  color: #0f172a;
-
+  color: #1a1225;
   font-size: 16px;
   line-height: 24px;
-  font-weight: 600;
+  font-weight: 700;
 }
-
 
 /* =========================================
    Order Items List
@@ -323,73 +265,56 @@
 .order-items-list {
   display: flex;
   flex-direction: column;
-
   gap: 16px;
 }
 
 .order-item {
   width: 100%;
-
   display: flex;
   align-items: center;
-
   gap: 12px;
 }
 
 .order-item-image {
   width: 56px;
   height: 56px;
-
   flex-shrink: 0;
-
   object-fit: cover;
-
-  background-color: #f1f5f9;
-
+  background-color: #f1eef8;
   border-radius: 12px;
 }
 
 .order-item-info {
   flex: 1;
-
   min-width: 0;
 }
 
 .order-item-name {
   margin: 0;
-
-  color: #0f172a;
-
+  color: #1a1225;
   font-size: 14px;
   line-height: 20px;
-  font-weight: 500;
-
+  font-weight: 600;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
-
   overflow: hidden;
 }
 
 .order-item-details {
   margin: 2px 0 0;
-
-  color: #94a3b8;
-
+  color: #a3a3b8;
   font-size: 12px;
   line-height: 16px;
 }
 
 .order-item-total {
   flex-shrink: 0;
-
-  color: #0f172a;
-
+  color: #1a1225;
   font-size: 14px;
   line-height: 20px;
-  font-weight: 600;
+  font-weight: 700;
 }
-
 
 /* =========================================
    Order Summary
@@ -398,46 +323,37 @@
 .order-summary {
   margin-top: 16px;
   padding-top: 16px;
-
   display: flex;
   flex-direction: column;
-
   gap: 8px;
-
-  border-top: 1px solid #f1f5f9;
+  border-top: 1px solid #f1eef8;
 }
 
 .order-summary-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
-
-  color: #64748b;
-
+  color: #6b6b80;
   font-size: 14px;
   line-height: 20px;
 }
 
 .free-shipping {
   color: #059669;
+  font-weight: 600;
 }
 
 .order-total-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
-
   padding-top: 8px;
-
-  border-top: 1px solid #f1f5f9;
-
-  color: #0f172a;
-
+  border-top: 1px solid #f1eef8;
+  color: #1a1225;
   font-size: 14px;
   line-height: 20px;
-  font-weight: 700;
+  font-weight: 800;
 }
-
 
 /* =========================================
    Right Information Column
@@ -446,10 +362,8 @@
 .order-info-column {
   display: flex;
   flex-direction: column;
-
   gap: 16px;
 }
-
 
 /* =========================================
    Information Cards
@@ -457,25 +371,20 @@
 
 .info-card {
   box-sizing: border-box;
-
   padding: 20px;
-
   background-color: #ffffff;
-
-  border: 1px solid #f1f5f9;
-  border-radius: 16px;
+  border: 1px solid rgba(124, 58, 237, 0.12);
+  border-radius: 1.25rem;
+  box-shadow: 0 2px 10px rgba(24, 16, 31, 0.05);
 }
 
 .info-card h3 {
   margin: 0 0 12px;
-
-  color: #0f172a;
-
+  color: #1a1225;
   font-size: 14px;
   line-height: 20px;
-  font-weight: 600;
+  font-weight: 700;
 }
-
 
 /* =========================================
    Shipping Information
@@ -483,19 +392,15 @@
 
 .shipping-name {
   margin: 0;
-
-  color: #334155;
-
+  color: #33334a;
   font-size: 14px;
   line-height: 20px;
-  font-weight: 500;
+  font-weight: 600;
 }
 
 .shipping-text {
   margin: 0;
-
-  color: #64748b;
-
+  color: #6b6b80;
   font-size: 14px;
   line-height: 20px;
 }
@@ -503,7 +408,6 @@
 .shipping-address-first {
   margin-top: 4px;
 }
-
 
 /* =========================================
    Payment
@@ -513,17 +417,14 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-
   gap: 12px;
 }
 
 .payment-method {
-  color: #475569;
-
+  color: #4b4b5e;
   font-size: 14px;
   line-height: 20px;
 }
-
 
 /* =========================================
    Invoice
@@ -531,22 +432,17 @@
 
 .invoice-number {
   margin: 0;
-
-  color: #64748b;
-
+  color: #6b6b80;
   font-size: 14px;
   line-height: 20px;
 }
 
 .invoice-date {
   margin: 0;
-
-  color: #94a3b8;
-
+  color: #a3a3b8;
   font-size: 12px;
   line-height: 16px;
 }
-
 
 /* =========================================
    Download Invoice Button
@@ -554,49 +450,37 @@
 
 .download-invoice-btn {
   width: 100%;
-
   box-sizing: border-box;
-
   display: flex;
   align-items: center;
   justify-content: center;
-
   gap: 8px;
-
   margin-top: 12px;
   padding: 10px 16px;
-
   background-color: transparent;
-
-  border: 1px solid #e2e8f0;
+  border: 1px solid rgba(124, 58, 237, 0.25);
   border-radius: 12px;
-
-  color: #334155;
-
+  color: #7c3aed;
   font-size: 14px;
   line-height: 20px;
-  font-weight: 500;
-
+  font-weight: 600;
   text-decoration: none;
-
   cursor: pointer;
-
   transition:
     background-color 0.2s ease,
     border-color 0.2s ease;
 }
 
 .download-invoice-btn:hover {
-  background-color: #f8fafc;
+  background-color: rgba(124, 58, 237, 0.06);
+  border-color: rgba(124, 58, 237, 0.4);
 }
 
 .download-invoice-icon {
   width: 16px;
   height: 16px;
-
-  color: #94a3b8;
+  color: #7c3aed;
 }
-
 
 /* =========================================
    Order Not Found
@@ -604,40 +488,34 @@
 
 .order-not-found {
   padding: 64px 20px;
-
   text-align: center;
 }
 
 .order-not-found-icon {
   margin-bottom: 12px;
-
   font-size: 36px;
   line-height: 40px;
 }
 
 .order-not-found h2 {
   margin: 0 0 4px;
-
-  color: #0f172a;
-
+  color: #1a1225;
   font-size: 18px;
   line-height: 28px;
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .order-not-found a {
-  color: #4f46e5;
-
+  color: #7c3aed;
   font-size: 14px;
   line-height: 20px;
-
   text-decoration: none;
+  font-weight: 600;
 }
 
 .order-not-found a:hover {
   text-decoration: underline;
 }
-
 
 /* =========================================
    Tablet
@@ -650,14 +528,10 @@
 
   .order-info-column {
     display: grid;
-
-    grid-template-columns:
-      repeat(3, minmax(0, 1fr));
-
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 16px;
   }
 }
-
 
 /* =========================================
    Mobile
@@ -681,15 +555,6 @@
     padding: 20px 16px;
   }
 
-  .timeline-line {
-    margin-left: 24px;
-    margin-right: 24px;
-  }
-
-  .timeline-progress {
-    margin-left: 24px;
-  }
-
   .timeline-circle {
     width: 30px;
     height: 30px;
@@ -705,7 +570,6 @@
   }
 }
 
-
 /* =========================================
    Small Mobile
    ========================================= */
@@ -713,9 +577,7 @@
 @media (max-width: 600px) {
   .order-title-row {
     flex-direction: column;
-
     align-items: flex-start;
-
     gap: 8px;
   }
 
@@ -725,15 +587,10 @@
 
   .timeline-line {
     top: 15px;
-
-    margin-left: 20px;
-    margin-right: 20px;
   }
 
   .timeline-progress {
     top: 15px;
-
-    margin-left: 20px;
   }
 
   .timeline-circle {
@@ -752,14 +609,12 @@
 
   .timeline-status {
     max-width: 65px;
-
     font-size: 10px;
     line-height: 14px;
   }
 
   .cancelled-notice {
     align-items: flex-start;
-
     padding: 16px;
   }
 
@@ -778,7 +633,6 @@
     padding: 16px;
   }
 }
-
 
 /* =========================================
    Very Small Mobile
@@ -817,7 +671,6 @@
   }
 }
 
-
 /* =========================================
    Print
    ========================================= */
@@ -842,12 +695,12 @@
 .order-cancel-btn {
   margin-top: 12px;
   padding: 10px 18px;
-  border: 1px solid #fecaca;
+  border: 1px solid #fecdd3;
   border-radius: 10px;
   background: #fff;
   color: #dc2626;
   font-size: 14px;
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
   transition: background-color 0.2s;
 }

@@ -95,30 +95,29 @@ export default function OrderDetail() {
   return (
     <div className="order-detail-page">
       <div className="order-detail-header">
-        <Breadcrumb
-          crumbs={[
-            { label: "My Orders", to: "/account/orders" },
-            { label: `ORD-${order.orderNumber}` },
-          ]}
-        />
-
-        <div className="order-title-row">
-          <h1>Order ORD-{order.orderNumber}</h1>
-          <OrderStatusBadge status={order.status} />
+        <div className="order-detail-header-card">
+          <Breadcrumb
+            crumbs={[
+              { label: "My Orders", to: "/account/orders" },
+              { label: `ORD-${order.orderNumber}` },
+            ]}
+          />
+          <div className="order-title-row">
+            <h1>Order ORD-{order.orderNumber}</h1>
+            <OrderStatusBadge status={order.status} />
+          </div>
+          <p className="order-date">{formattedOrderDate}</p>
+          {canCancel && (
+            <button
+              type="button"
+              onClick={handleCancel}
+              disabled={cancelling}
+              className="order-cancel-btn"
+            >
+              {cancelling ? "Cancelling…" : "Cancel Order"}
+            </button>
+          )}
         </div>
-
-        <p className="order-date">{formattedOrderDate}</p>
-
-        {canCancel && (
-          <button
-            type="button"
-            onClick={handleCancel}
-            disabled={cancelling}
-            className="order-cancel-btn"
-          >
-            {cancelling ? "Cancelling…" : "Cancel Order"}
-          </button>
-        )}
       </div>
 
       {/* Order Timeline — tracks the current status only; the backend
@@ -133,7 +132,7 @@ export default function OrderDetail() {
             <div
               className="timeline-progress"
               style={{
-                width: `${Math.max(0, currentIdx / (STATUS_ORDER.length - 1)) * 100}%`,
+                width: `${Math.max(0, currentIdx / (STATUS_ORDER.length - 1)) * (100 - 100 / STATUS_ORDER.length)}%`,
               }}
             />
 
