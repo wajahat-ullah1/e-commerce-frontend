@@ -277,7 +277,7 @@ export default function ProductDetail() {
             <div className="product-stock-section">
               <StockBadge stock={product.stock} />
 
-              {product.stock > 0 && product.stock <= 10 && (
+              {product.stock > 0 && product.stock <= 5 && (
                 <p className="product-low-stock">
                   Only {product.stock} left in stock
                 </p>

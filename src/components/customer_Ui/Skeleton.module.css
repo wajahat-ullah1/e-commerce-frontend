@@ -1,14 +1,14 @@
 .skeleton {
-  border-radius: var(--radius-md);
-  background: linear-gradient(90deg, var(--color-slate-100) 25%, var(--color-slate-200) 50%, var(--color-slate-100) 75%);
+  border-radius: 0.6rem;
+  background: linear-gradient(90deg, #f1eef8 25%, #e5def2 50%, #f1eef8 75%);
   background-size: 200% 100%;
   animation: shimmer 1.5s infinite;
 }
 
 .card {
-  background: var(--color-white);
-  border: 1px solid var(--color-slate-100);
-  border-radius: var(--radius-lg);
+  background: #ffffff;
+  border: 1px solid rgba(124, 58, 237, 0.12);
+  border-radius: 1.25rem;
   overflow: hidden;
 }
 
@@ -36,12 +36,12 @@
 }
 
 .priceLine { height: 1.25rem; width: 25%; }
-.buttonLine { height: 2.25rem; width: 6rem; border-radius: var(--radius-md); }
+.buttonLine { height: 2.25rem; width: 6rem; border-radius: 0.6rem; }
 
 .orderCard {
-  background: var(--color-white);
-  border: 1px solid var(--color-slate-100);
-  border-radius: var(--radius-lg);
+  background: #ffffff;
+  border: 1px solid rgba(124, 58, 237, 0.12);
+  border-radius: 1.25rem;
   padding: 1.25rem;
   display: flex;
   flex-direction: column;
@@ -55,7 +55,7 @@
 }
 
 .orderNumber { height: 1rem; width: 7rem; }
-.orderPill { height: 1.5rem; width: 5rem; border-radius: var(--radius-full); }
+.orderPill { height: 1.5rem; width: 5rem; border-radius: 9999px; }
 .orderDate { height: 0.75rem; width: 10rem; }
 
 .orderItemRow {
@@ -68,7 +68,7 @@
 .orderThumb {
   height: 3.5rem;
   width: 3.5rem;
-  border-radius: var(--radius-md);
+  border-radius: 0.75rem;
 }
 
 .orderItemText {
@@ -80,3 +80,8 @@
 
 .orderItemLine1 { height: 1rem; width: 75%; }
 .orderItemLine2 { height: 0.75rem; width: 50%; }
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}

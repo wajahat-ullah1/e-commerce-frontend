@@ -15,10 +15,10 @@
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  background: var(--color-white);
-  border: 1px solid var(--color-slate-200);
-  border-radius: var(--radius-md);
-  box-shadow: var(--shadow-lg);
+  background: #ffffff;
+  border: 1px solid rgba(124, 58, 237, 0.15);
+  border-radius: 0.75rem;
+  box-shadow: 0 12px 30px rgba(24, 16, 31, 0.15);
   padding: 0.75rem 1rem;
   min-width: 280px;
   max-width: 24rem;
@@ -31,13 +31,13 @@
 }
 
 .iconSuccess { color: #10b981; }
-.iconError { color: var(--color-red-500); }
-.iconInfo { color: var(--color-indigo-500); }
+.iconError { color: #ef4444; }
+.iconInfo { color: #7c3aed; }
 
 .message {
   font-size: 0.875rem;
-  font-weight: 500;
-  color: var(--color-slate-800);
+  font-weight: 600;
+  color: #1a1225;
   flex: 1;
 }
 
@@ -45,16 +45,21 @@
   background: transparent;
   border: none;
   cursor: pointer;
-  color: var(--color-slate-400);
+  color: #a3a3b8;
   margin-left: 0.25rem;
   transition: color 0.2s ease;
 }
 
 .dismissButton:hover {
-  color: var(--color-slate-600);
+  color: #4b4b5e;
 }
 
 .dismissIcon {
   width: 1rem;
   height: 1rem;
+}
+
+@keyframes slideInRight {
+  from { transform: translateX(100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
 }

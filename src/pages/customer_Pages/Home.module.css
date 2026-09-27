@@ -356,21 +356,19 @@
 @media (min-width: 1024px) {
   .categoryGrid {
     grid-template-columns: repeat(6, 1fr);
+    gap: 1.5rem;
   }
 }
 
 .categoryCard {
   position: relative;
+  display: block;
   background: #150f22;
   border: 1px solid rgba(192, 132, 252, 0.12);
-  border-radius: 1.25rem;
+  border-radius: 1rem;
   overflow: hidden;
-  padding: 1.5rem 1rem;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  gap: 0.5rem;
+  aspect-ratio: 1.1 / 1;
+  text-decoration: none;
   transition:
     border-color 0.2s ease,
     transform 0.2s ease;
@@ -379,6 +377,73 @@
 .categoryCard:hover {
   border-color: rgba(192, 132, 252, 0.5);
   transform: translateY(-2px);
+}
+
+/* Categories with an uploaded image: photo fills the whole tile, name and
+   product count sit on a gradient at the bottom so they stay readable over
+   any photo. */
+.categoryImageWrap {
+  position: absolute;
+  inset: 0;
+}
+
+.categoryImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.35s ease;
+}
+
+.categoryCard:hover .categoryImage {
+  transform: scale(1.06);
+}
+
+.categoryImageOverlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to top,
+    rgba(8, 5, 13, 0.92) 0%,
+    rgba(8, 5, 13, 0.45) 50%,
+    rgba(8, 5, 13, 0) 85%
+  );
+}
+
+.categoryImageText {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 1rem;
+  text-align: left;
+}
+
+.categoryImageTitle {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #f5f3ff;
+  margin: 0;
+}
+
+.categoryImageMeta {
+  font-size: 0.75rem;
+  color: rgba(245, 243, 255, 0.75);
+  margin: 0.15rem 0 0;
+}
+
+/* Categories without an image yet: keep the compact centered icon layout,
+   filling the same tile size as the image variant for a consistent grid. */
+.categoryCardPlain {
+  width: 100%;
+  height: 100%;
+  padding: 1.5rem 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 0.35rem;
 }
 
 .categoryIconWrap {
@@ -417,25 +482,30 @@
 
 .promoCard {
   position: relative;
-  background: linear-gradient(135deg, #1a0f2e, #2a0f2e);
-  border: 1px solid rgba(192, 132, 252, 0.2);
+  background: #11131c;
+  border: 1px solid rgba(99, 102, 241, 0.18);
   border-radius: 1.75rem;
   overflow: hidden;
 }
 
 .promoGlow {
   position: absolute;
-  top: -30%;
-  right: 10%;
-  width: 24rem;
-  height: 24rem;
-  background: radial-gradient(
-    circle,
-    rgba(192, 38, 211, 0.35),
-    transparent 70%
-  );
-  filter: blur(20px);
-  pointer-events: none;
+  inset: 0;
+  background:
+    /* soft dark veil so the corner glows read as "peeking" rather than flat */
+    linear-gradient(rgba(9, 9, 17, 0.35), rgba(9, 9, 17, 0.6)),
+    /* warm maroon accents in opposite corners */
+    radial-gradient(
+      120% 90% at 6% 0%,
+      rgba(122, 24, 51, 0.85) 0%,
+      transparent 42%
+    ),
+    radial-gradient(
+      120% 90% at 94% 100%,
+      rgba(122, 24, 51, 0.7) 0%,
+      transparent 45%
+    ),
+    #12131f;
 }
 
 .promoInner {
@@ -468,7 +538,7 @@
   font-weight: 700;
   letter-spacing: 0.15em;
   text-transform: uppercase;
-  color: #22d3ee;
+  color: #818cf8;
   margin-bottom: 0.75rem;
 }
 
@@ -492,7 +562,7 @@
 .promoButton {
   margin-top: 1.5rem;
   padding: 0.75rem 1.5rem;
-  background: linear-gradient(135deg, #7c3aed, #c026d3);
+  background: #6366f1;
   color: #fff;
   font-weight: 700;
   border-radius: 0.9rem;
@@ -507,30 +577,28 @@
 
 .promoBadgeWrap {
   flex-shrink: 0;
-  text-align: center;
+  text-align: right;
+  padding-right: 1rem;
 }
 
 .promoBadgeNumber {
-  font-size: 4.5rem;
+  font-size: 5rem;
   font-weight: 900;
-  background: linear-gradient(135deg, #c084fc, #f0abfc);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+  color: rgba(148, 163, 184, 0.22);
   line-height: 1;
   user-select: none;
 }
 
 @media (min-width: 640px) {
   .promoBadgeNumber {
-    font-size: 6rem;
+    font-size: 7.5rem;
   }
 }
 
 .promoBadgeOff {
   font-size: 1.5rem;
   font-weight: 700;
-  color: #22d3ee;
+  color: #818cf8;
   margin-top: -1rem;
 }
 

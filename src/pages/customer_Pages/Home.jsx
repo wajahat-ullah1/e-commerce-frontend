@@ -307,25 +307,48 @@ export default function Home() {
                   to={`/shop?category=${cat.id}`}
                   className={styles.categoryCard}
                 >
-                  <div className={styles.categoryIconWrap}>
-                    <svg
-                      className={styles.categoryIcon}
-                      viewBox="0 0 24 24"
-                      fill={icon.filled ? "currentColor" : "none"}
-                      stroke={icon.filled ? "none" : "currentColor"}
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={1.6}
-                        d={icon.d}
-                      />
-                    </svg>
-                  </div>
-                  <p className={styles.categoryName}>{cat.name}</p>
-                  <p className={styles.categoryCount}>
-                    {cat._count?.products ?? 0} items
-                  </p>
+                  {cat.image ? (
+                    <>
+                      <div className={styles.categoryImageWrap}>
+                        <img
+                          src={cat.image}
+                          alt={cat.name}
+                          className={styles.categoryImage}
+                        />
+                      </div>
+                      <div className={styles.categoryImageOverlay} />
+                      <div className={styles.categoryImageText}>
+                        <p className={styles.categoryImageTitle}>
+                          {cat.name}
+                        </p>
+                        <p className={styles.categoryImageMeta}>
+                          {cat._count?.products ?? 0} items
+                        </p>
+                      </div>
+                    </>
+                  ) : (
+                    <div className={styles.categoryCardPlain}>
+                      <div className={styles.categoryIconWrap}>
+                        <svg
+                          className={styles.categoryIcon}
+                          viewBox="0 0 24 24"
+                          fill={icon.filled ? "currentColor" : "none"}
+                          stroke={icon.filled ? "none" : "currentColor"}
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={1.6}
+                            d={icon.d}
+                          />
+                        </svg>
+                      </div>
+                      <p className={styles.categoryName}>{cat.name}</p>
+                      <p className={styles.categoryCount}>
+                        {cat._count?.products ?? 0} items
+                      </p>
+                    </div>
+                  )}
                 </Link>
               );
             })}
@@ -458,7 +481,7 @@ export default function Home() {
       </section>
 
       {/* Testimonials */}
-      <section className={styles.sectionDarker}>
+      <section className={styles.sectionLight}>
         <div className={styles.container}>
           <div className={styles.centerHead}>
             <p className={styles.eyebrow}>Reviews</p>

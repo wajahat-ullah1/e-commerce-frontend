@@ -1,8 +1,10 @@
+/* Badge.module.css */
+
 .badge {
   display: inline-flex;
   align-items: center;
-  border-radius: var(--radius-full);
-  font-weight: 500;
+  border-radius: 9999px;
+  font-weight: 600;
 }
 
 .sm {
@@ -16,8 +18,8 @@
 }
 
 .default {
-  background: var(--color-slate-100);
-  color: var(--color-slate-700);
+  background: #f1eef8;
+  color: #4b4b5e;
 }
 
 .success {
@@ -26,12 +28,12 @@
 }
 
 .warning {
-  background: var(--color-amber-50);
-  color: var(--color-warning);
+  background: #fffbeb;
+  color: #b45309;
 }
 
 .danger {
-  background: var(--color-red-50);
+  background: #fef2f2;
   color: #b91c1c;
 }
 
@@ -41,11 +43,11 @@
 }
 
 .muted {
-  background: var(--color-slate-100);
-  color: var(--color-slate-500);
+  background: #f1eef8;
+  color: #a3a3b8;
 }
 
 .accent {
-  background: var(--color-indigo-50);
-  color: var(--color-indigo-600);
+  background: rgba(124, 58, 237, 0.1);
+  color: #7c3aed;
 }

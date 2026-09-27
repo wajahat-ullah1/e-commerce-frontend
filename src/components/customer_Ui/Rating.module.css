@@ -19,18 +19,18 @@
 }
 
 .starEmpty {
-  color: var(--color-slate-200);
+  color: #ede9f5;
 }
 
 .valueText {
   font-size: 0.875rem;
-  font-weight: 600;
-  color: var(--color-slate-700);
+  font-weight: 700;
+  color: #1a1225;
 }
 
 .countText {
   font-size: 0.875rem;
-  color: var(--color-slate-400);
+  color: #a3a3b8;
 }
 
 .selectorButton {

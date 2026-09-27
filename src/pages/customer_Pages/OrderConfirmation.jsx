@@ -37,7 +37,7 @@ export default function OrderConfirmation() {
   const orderSummary = [
     {
       label: "Order Number",
-      value: `#${data.orderNumber}`,
+      value: `ORD-${data.orderNumber}`,
     },
     {
       label: "Order Date",
@@ -49,7 +49,7 @@ export default function OrderConfirmation() {
     },
     {
       label: "Total Amount",
-      value: `$${data.total?.toFixed(2) || "0.00"}`,
+      value: `Rs ${data.total?.toFixed(2) || "0.00"}`,
     },
     {
       label: "Payment",
@@ -145,7 +145,7 @@ export default function OrderConfirmation() {
                     </div>
 
                     <span className="order-confirmation-item-price">
-                      ${(product.price * quantity).toFixed(2)}
+                      Rs {(product.price * quantity).toFixed(2)}
                     </span>
                   </div>
                 ))}
@@ -153,7 +153,7 @@ export default function OrderConfirmation() {
 
               <div className="order-confirmation-items-total">
                 <span>Total</span>
-                <span>${data.total?.toFixed(2)}</span>
+                <span>Rs {data.total?.toFixed(2)}</span>
               </div>
             </div>
           )}
@@ -215,7 +215,7 @@ export default function OrderConfirmation() {
                 <p>Cash on Delivery</p>
 
                 <span>
-                  Payment of ${data.total?.toFixed(2)} will be collected upon
+                  Payment of Rs {data.total?.toFixed(2)} will be collected upon
                   delivery.
                 </span>
               </div>

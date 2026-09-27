@@ -3,7 +3,7 @@
   align-items: center;
   gap: 0.375rem;
   font-size: 0.875rem;
-  color: var(--color-slate-500);
+  color: #a3a3b8;
 }
 
 .crumb {
@@ -13,7 +13,7 @@
 }
 
 .separator {
-  color: var(--color-slate-300);
+  color: #d1cbe0;
 }
 
 .link {
@@ -21,10 +21,10 @@
 }
 
 .link:hover {
-  color: var(--color-indigo-600);
+  color: #7c3aed;
 }
 
 .current {
-  color: var(--color-slate-900);
-  font-weight: 500;
+  color: #1a1225;
+  font-weight: 600;
 }

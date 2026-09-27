@@ -503,7 +503,7 @@ export default function Checkout() {
                         </div>
 
                         <span className="checkout-review-price">
-                          ${(product.price * quantity).toFixed(2)}
+                          {(product.price * quantity).toFixed(2)}
                         </span>
                       </div>
                     ))}
@@ -512,7 +512,7 @@ export default function Checkout() {
                   <div className="checkout-review-summary">
                     <div>
                       <span>Subtotal</span>
-                      <span>${cartTotal.toFixed(2)}</span>
+                      <span>{cartTotal.toFixed(2)}</span>
                     </div>
 
                     <div>
@@ -522,7 +522,7 @@ export default function Checkout() {
 
                     <div className="checkout-review-total">
                       <span>Total</span>
-                      <span>${cartTotal.toFixed(2)}</span>
+                      <span>{cartTotal.toFixed(2)}</span>
                     </div>
                   </div>
 
@@ -674,7 +674,7 @@ export default function Checkout() {
                     </p>
 
                     <span className="checkout-summary-product-price">
-                      ${(product.price * quantity).toFixed(2)}
+                      {(product.price * quantity).toFixed(2)}
                     </span>
                   </div>
                 ))}
@@ -689,7 +689,7 @@ export default function Checkout() {
               <div className="checkout-sidebar-total">
                 <div>
                   <span>Subtotal</span>
-                  <span>${cartTotal.toFixed(2)}</span>
+                  <span>{cartTotal.toFixed(2)}</span>
                 </div>
 
                 <div>
@@ -699,7 +699,7 @@ export default function Checkout() {
 
                 <div className="checkout-sidebar-total-row">
                   <span>Total</span>
-                  <span>${cartTotal.toFixed(2)}</span>
+                  <span>{cartTotal.toFixed(2)}</span>
                 </div>
               </div>
             </div>
