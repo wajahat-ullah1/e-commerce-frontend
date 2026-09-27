@@ -142,7 +142,7 @@ export default function Wishlist() {
                 <div className="wishlist-price-section">
 
                   <span className="wishlist-price">
-                    ${product.price.toFixed(2)}
+                    Rs {product.price}
                   </span>
 
                   <div className="wishlist-stock">

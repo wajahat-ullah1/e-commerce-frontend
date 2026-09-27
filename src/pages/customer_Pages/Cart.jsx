@@ -192,15 +192,15 @@ export default function Cart() {
 
                       <div className="cart-product-price">
                         <p>
-                          {(
+                          Rs {(
                             product.price *
                             quantity
-                          ).toFixed(2)}
+                          )}
                         </p>
 
                         {quantity > 1 && (
                           <span>
-                            {product.price.toFixed(2)} each
+                            Rs {product.price} each
                           </span>
                         )}
                       </div>
@@ -241,7 +241,7 @@ export default function Cart() {
                   </span>
 
                   <span className="cart-summary-price">
-                    {cartTotal.toFixed(2)}
+                    Rs {cartTotal}
                   </span>
                 </div>
 
@@ -260,7 +260,7 @@ export default function Cart() {
                   >
                     {shipping === 0
                       ? 'Free'
-                      : `$${shipping.toFixed(2)}`}
+                      : `${shipping}`}
                   </span>
                 </div>
 
@@ -280,7 +280,7 @@ export default function Cart() {
                 </span>
 
                 <span>
-                  {(cartTotal + shipping).toFixed(2)}
+                  Rs {(cartTotal + shipping)}
                 </span>
               </div>
 

@@ -115,7 +115,7 @@ export default function Footer() {
 
         <div className="footer-bottom">
           <p className="footer-copyright">
-            © 2026 Lumière. All rights reserved.
+            © 2026 Sami Games. All rights reserved.
           </p>
           <div className="footer-legal-links">
             <Link to="/" className="footer-legal-link">

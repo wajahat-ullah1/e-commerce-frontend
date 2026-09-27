@@ -236,7 +236,7 @@ export default function Products() {
                           className={
                             p.stock === 0
                               ? "stock-out"
-                              : p.stock < 10
+                              : p.stock <= 5
                                 ? "stock-low"
                                 : "stock-normal"
                           }
@@ -255,7 +255,7 @@ export default function Products() {
                           status={
                             p.stock === 0
                               ? "Out of Stock"
-                              : p.stock < 10
+                              : p.stock <= 5
                                 ? "Low Stock"
                                 : "In Stock"
                           }

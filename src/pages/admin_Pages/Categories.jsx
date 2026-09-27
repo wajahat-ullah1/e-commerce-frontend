@@ -3,7 +3,6 @@ import { Plus, Edit3, Trash2, Tag, ImagePlus, X } from "lucide-react";
 import {
   Card,
   Button,
-  Input,
   Modal,
   ConfirmDialog,
   EmptyState,
@@ -11,6 +10,10 @@ import {
 import { useFetch } from "../../hooks/useFetch";
 import { categoryService } from "../../services/categoryService";
 import { useApp } from "../../context/useApp";
+import {
+  getAvailablePresets,
+  getPresetByName,
+} from "../../data/sidebarCategories";
 import "./Categories.css";
 
 export default function Categories() {
@@ -35,6 +38,21 @@ export default function Categories() {
   const fileInputRef = useRef(null);
 
   const cats = categories || [];
+
+  // Presets the admin is allowed to pick from right now. On create, any
+  // preset not already used by an existing category. On edit, the category
+  // being edited is excluded from the "already used" check first, so its
+  // current preset still appears as a choice (letting the admin re-confirm
+  // it, or switch to a different unused preset).
+  const availablePresets = getAvailablePresets(
+    editCat ? cats.filter((c) => c.id !== editCat.id) : cats,
+  );
+
+  // If the category was created before this dropdown existed (or its name
+  // was edited directly some other way) and doesn't match any preset, keep
+  // it selectable in the dropdown too so opening "Edit" doesn't silently
+  // wipe out its name.
+  const selectedPreset = getPresetByName(newName);
 
   // Revoke any object URL we created for a locally picked file once it's
   // replaced or the modal closes, so we don't leak memory.
@@ -229,12 +247,54 @@ export default function Categories() {
           onClose={closeModal}
         >
           <div className="categories-modal-content">
-            <Input
-              label="Category Name"
-              placeholder="e.g. Electronics"
-              value={newName}
-              onChange={(e) => setNewName(e.target.value)}
-            />
+            <div className="categories-select-field">
+              <label
+                className="categories-image-label"
+                htmlFor="categoryPresetSelect"
+              >
+                Category
+              </label>
+
+              <select
+                id="categoryPresetSelect"
+                className="categories-select-input"
+                value={newName}
+                onChange={(e) => setNewName(e.target.value)}
+              >
+                <option value="" disabled>
+                  Select a category…
+                </option>
+
+                {availablePresets.map((preset) => (
+                  <option key={preset.name} value={preset.name}>
+                    {preset.name}
+                  </option>
+                ))}
+
+                {/* Only shown when editing a legacy category whose name
+                    doesn't match any hardcoded preset, so it stays selected
+                    instead of the select silently falling back to blank. */}
+                {editCat && !selectedPreset && (
+                  <option value={editCat.name}>{editCat.name} (custom)</option>
+                )}
+              </select>
+
+              {selectedPreset ? (
+                <p className="categories-preset-preview">
+                  <selectedPreset.icon className="categories-preset-preview-icon" />
+                  This category will show up in the storefront sidebar as
+                  &ldquo;{newName}&rdquo; with this icon.
+                </p>
+              ) : (
+                editCat && (
+                  <p className="categories-image-hint">
+                    This name doesn&apos;t match a sidebar preset, so it won&apos;t
+                    appear in the storefront sidebar — it&apos;ll still work
+                    everywhere else (Shop filters, product pages, etc.).
+                  </p>
+                )
+              )}
+            </div>
 
             <div className="categories-image-field">
               <label className="categories-image-label">Category Image</label>

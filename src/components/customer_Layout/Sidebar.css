@@ -1,0 +1,134 @@
+/* Pure spacer — reserves 64px in the normal page flow so main content
+   doesn't render underneath the fixed sidebar. Has no visual styling of
+   its own; the actual sidebar below is position: fixed and independent of
+   this element's position once the page scrolls. */
+.app-sidebar-wrap {
+  width: 64px;
+  flex-shrink: 0;
+}
+
+/* Full-viewport dim + blur behind the flyout, painted above the rest of the
+   page (but below the aside itself). Not a descendant of <aside>, so moving
+   the mouse onto it fires the aside's onMouseLeave and collapses the menu. */
+.app-sidebar-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(17, 17, 17, 0.45);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+  z-index: 40;
+}
+
+.app-sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  width: 64px;
+  display: flex;
+  flex-direction: column;
+  background: #ffffff;
+  border-right: 1px solid #f0f0f1;
+  overflow: hidden;
+  z-index: 50;
+  transition: width 0.2s ease, box-shadow 0.2s ease;
+}
+
+.app-sidebar.is-expanded {
+  width: 240px;
+  box-shadow: 8px 0 28px rgba(0, 0, 0, 0.12);
+}
+
+/* Pink "Menu" title row, pinned to the top of the sidebar/flyout. */
+.app-sidebar-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  padding: 24px 21px;
+  background: #ec1279;
+  color: #ffffff;
+  flex-shrink: 0;
+}
+
+.app-sidebar-header .app-sidebar-icon {
+  color: #ffffff;
+}
+
+.app-sidebar-header .app-sidebar-label {
+  font-weight: 700;
+  font-size: 15px;
+}
+
+.app-sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  padding: 12px 0;
+  overflow-y: auto;
+}
+
+.app-sidebar-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  padding: 11px 21px;
+  border: none;
+  background: none;
+  color: #71717a;
+  font-size: 14px;
+  white-space: nowrap;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.app-sidebar-item:hover {
+  background: #fdf2f8;
+  color: #ec4899;
+}
+
+.app-sidebar-item.is-active {
+  background: #fdf2f8;
+  color: #ec4899;
+  font-weight: 600;
+}
+
+.app-sidebar-item.is-disabled {
+  color: #d4d4d8;
+  cursor: not-allowed;
+}
+
+.app-sidebar-item.is-disabled:hover {
+  background: none;
+  color: #d4d4d8;
+}
+
+.app-sidebar-icon {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+/* Hidden by default (collapsed rail) — opacity + max-width both animated so
+   there is zero leaked text at any point during the collapsed state. */
+.app-sidebar-label {
+  opacity: 0;
+  max-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  transition: opacity 0.15s ease, max-width 0.2s ease;
+}
+
+.app-sidebar.is-expanded .app-sidebar-label {
+  opacity: 1;
+  max-width: 160px;
+}
+
+.app-sidebar-tag {
+  margin-left: auto;
+  font-size: 10px;
+  color: #a1a1aa;
+  flex: 1;
+}

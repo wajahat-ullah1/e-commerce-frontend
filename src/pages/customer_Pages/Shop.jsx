@@ -17,10 +17,10 @@ const SORT_OPTIONS = [
 
 const SERVER_SORTS = new Set(["price_asc", "price_desc", "oldest"]);
 
-const DEFAULT_PRICE_RANGE = [0, 1500];
 const LIMIT = 8;
 
 const CLIENT_FILTER_FETCH_LIMIT = 100;
+const PRICE_DEBOUNCE_MS = 400;
 
 export default function Shop() {
   const [params, setParams] = useSearchParams();
@@ -32,7 +32,41 @@ export default function Shop() {
     return category ? Number(category) : null;
   });
 
-  const [priceRange, setPriceRange] = useState(DEFAULT_PRICE_RANGE);
+  // Keep selectedCategoryId in sync with the `category` URL param on every
+  // change, not just on first mount. Needed because clicking a category in
+  // the persistent Sidebar just does navigate("/shop?category=ID") — when
+  // Shop is already mounted, React Router reuses the same component
+  // instance, so the lazy useState initializer above never runs again and
+  // the filter silently stayed stuck on its old value.
+  useEffect(() => {
+    const category = params.get("category");
+    setSelectedCategoryId(category ? Number(category) : null);
+  }, [params]);
+
+  // Raw text the user is typing — starts genuinely empty ("", not "0" or
+  // some default number), so there's nothing to fight with/delete before
+  // typing a real value, and the inputs show only their placeholders
+  // ("Min" / "Max") until the shopper actually enters something.
+  const [minPriceInput, setMinPriceInput] = useState("");
+  const [maxPriceInput, setMaxPriceInput] = useState("");
+
+  // The values actually used to filter/fetch — undefined means "no bound",
+  // so with both inputs empty every product shows, exactly as requested.
+  // These are debounced off the raw text above so a fast-typed number like
+  // "20000" doesn't fire a fetch after every single digit.
+  const [minPrice, setMinPrice] = useState(undefined);
+  const [maxPrice, setMaxPrice] = useState(undefined);
+
+  useEffect(() => {
+    const handle = setTimeout(() => {
+      setMinPrice(minPriceInput === "" ? undefined : Number(minPriceInput));
+      setMaxPrice(maxPriceInput === "" ? undefined : Number(maxPriceInput));
+      setPage(1);
+    }, PRICE_DEBOUNCE_MS);
+
+    return () => clearTimeout(handle);
+  }, [minPriceInput, maxPriceInput]);
+
   const [minRating, setMinRating] = useState(0);
   const [inStockOnly, setInStockOnly] = useState(false);
 
@@ -67,10 +101,8 @@ export default function Shop() {
       const baseParams = {
         search: query || undefined,
         categoryId: selectedCategoryId || undefined,
-        minPrice:
-          priceRange[0] > DEFAULT_PRICE_RANGE[0] ? priceRange[0] : undefined,
-        maxPrice:
-          priceRange[1] < DEFAULT_PRICE_RANGE[1] ? priceRange[1] : undefined,
+        minPrice,
+        maxPrice,
         sort: SERVER_SORTS.has(sort) ? sort : undefined,
       };
 
@@ -120,7 +152,8 @@ export default function Shop() {
   }, [
     query,
     selectedCategoryId,
-    priceRange,
+    minPrice,
+    maxPrice,
     sort,
     page,
     minRating,
@@ -148,18 +181,31 @@ export default function Shop() {
   const selectCategory = (categoryId) => {
     setPage(1);
     setSelectedCategoryId((prev) => (prev === categoryId ? null : categoryId));
+    window.scrollTo(0, 0);
   };
 
   const clearFilters = () => {
     setSelectedCategoryId(null);
-    setPriceRange(DEFAULT_PRICE_RANGE);
+    setMinPriceInput("");
+    setMaxPriceInput("");
+    setMinPrice(undefined);
+    setMaxPrice(undefined);
     setMinRating(0);
     setInStockOnly(false);
     setPage(1);
     setParams({});
+    window.scrollTo(0, 0);
   };
 
-  const FilterPanel = () => (
+  // NOTE: this used to be `const FilterPanel = () => (...)` — a component
+  // defined *inside* Shop's render. That meant every re-render (including
+  // the one triggered by typing a single digit into a price input) created
+  // a brand-new function reference, so React treated <FilterPanel /> as a
+  // different component type each time and remounted the whole subtree
+  // instead of just updating it — which drops input focus after every
+  // keystroke. It's now plain JSX spliced directly into the render output
+  // below, so React reconciles it normally and focus is preserved.
+  const filterPanelContent = (
     <div className="shop-filter-panel-content">
       <div className="shop-filter-header">
         <h3>Filters</h3>
@@ -213,11 +259,8 @@ export default function Shop() {
           <input
             type="number"
             id="startprice"
-            value={priceRange[0]}
-            onChange={(e) => {
-              setPage(1);
-              setPriceRange([Number(e.target.value), priceRange[1]]);
-            }}
+            value={minPriceInput}
+            onChange={(e) => setMinPriceInput(e.target.value)}
             min={0}
             placeholder="Min"
           />
@@ -227,11 +270,8 @@ export default function Shop() {
           <input
             type="number"
             id="nndprice"
-            value={priceRange[1]}
-            onChange={(e) => {
-              setPage(1);
-              setPriceRange([priceRange[0], Number(e.target.value)]);
-            }}
+            value={maxPriceInput}
+            onChange={(e) => setMaxPriceInput(e.target.value)}
             min={0}
             placeholder="Max"
           />
@@ -303,9 +343,7 @@ export default function Shop() {
         <div className="shop-layout">
           {/* Desktop Filter Sidebar */}
           <aside className="shop-sidebar">
-            <div className="shop-sidebar-card">
-              <FilterPanel />
-            </div>
+            <div className="shop-sidebar-card">{filterPanelContent}</div>
           </aside>
 
           {/* Products Area */}
@@ -532,9 +570,7 @@ export default function Shop() {
               </button>
             </div>
 
-            <div className="shop-drawer-content">
-              <FilterPanel />
-            </div>
+            <div className="shop-drawer-content">{filterPanelContent}</div>
 
             <div className="shop-drawer-footer">
               <button

@@ -132,7 +132,7 @@ export default function Dashboard() {
 
                 <div className="dashboard-order-total">
                   <OrderStatusBadge status={order.status} />
-                  <p className="dashboard-price">${order.total.toFixed(2)}</p>
+                  <p className="dashboard-price">Rs {order.total}</p>
                 </div>
 
                 <Link

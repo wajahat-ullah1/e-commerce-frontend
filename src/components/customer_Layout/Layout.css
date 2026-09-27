@@ -7,3 +7,13 @@
 .main {
   flex: 1;
 }
+
+.main-with-sidebar {
+  display: flex;
+  align-items: stretch;
+}
+ 
+.main-content {
+  flex: 1;
+  min-width: 0; /* prevents child content from overflowing the row */
+}

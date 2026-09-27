@@ -171,9 +171,9 @@ export default function Invoice() {
                     </div>
                   </td>
                   <td className="quantity-cell">{item.quantity}</td>
-                  <td className="price-cell">{item.price.toFixed(2)}</td>
+                  <td className="price-cell">Rs {item.price}</td>
                   <td className="total-cell">
-                    {(item.price * item.quantity).toFixed(2)}
+                    Rs {(item.price * item.quantity)}
                   </td>
                 </tr>
               ))}
@@ -185,7 +185,7 @@ export default function Invoice() {
           <div className="invoice-summary">
             <div className="summary-row">
               <span>Subtotal</span>
-              <span>{order.subtotal.toFixed(2)}</span>
+              <span>Rs {order.subtotal}</span>
             </div>
 
             <div className="summary-row">
@@ -195,7 +195,7 @@ export default function Invoice() {
 
             <div className="grand-total-row">
               <span>Grand Total</span>
-              <span>{order.total.toFixed(2)}</span>
+              <span>Rs {order.total}</span>
             </div>
           </div>
         </div>
