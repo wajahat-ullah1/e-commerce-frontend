@@ -34,10 +34,23 @@ function buildQuery(params = {}) {
 
 export const productService = {
   list: (params = {}) =>
-    api.get(`/products?${new URLSearchParams(params)}`).then((res) => res.products),
+    api
+      .get(`/products?${new URLSearchParams(params)}`)
+      .then((res) => res.products),
+
+  // Customer-facing "most units sold" list, normalized the same way as
+  // listPaged/getNormalized so ProductCard gets a consistent shape
+  // (price as a number, images as an array of URL strings, etc.)
+  bestSellers: (limit = 4) =>
+    api
+      .get(`/products/best-sellers?limit=${limit}`)
+      .then((res) => (res.products || []).map(normalizeProduct)),
+
   get: (id) => api.get(`/products/${id}`).then((res) => res.product),
-  create: (formData) => api.post("/products", formData).then((res) => res.product),
-  update: (id, formData) => api.put(`/products/${id}`, formData).then((res) => res.product),
+  create: (formData) =>
+    api.post("/products", formData).then((res) => res.product),
+  update: (id, formData) =>
+    api.put(`/products/${id}`, formData).then((res) => res.product),
   remove: (id) => api.delete(`/products/${id}`),
 
   // Customer-facing: same GET /products endpoint, but returns normalized

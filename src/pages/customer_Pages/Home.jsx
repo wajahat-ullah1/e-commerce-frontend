@@ -1,7 +1,10 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { products, categories, testimonials } from "../../data/products";
+import { productService } from "../../services/productService";
+import { categoryService } from "../../services/categoryService";
+import { useFetch } from "../../hooks/useFetch";
 import ProductCard from "../../components/customer_Ui/ProductCard";
+import { ProductCardSkeleton } from "../../components/customer_Ui/Skeleton";
 import Rating from "../../components/customer_Ui/Rating";
 import styles from "./Home.module.css";
 
@@ -68,19 +71,139 @@ const benefits = [
   },
 ];
 
+// NOTE: There is no site-wide "testimonials" table/endpoint in the backend
+// (the Review model is per-product only, and its list endpoints are either
+// scoped to one product or admin-only). Until that exists, these stay as
+// curated marketing copy rather than live data. See the message accompanying
+// this file for how to wire this up to real reviews if you want it dynamic.
+const testimonials = [
+  {
+    id: 1,
+    rating: 5,
+    text: "Ordered a controller and it showed up the next day, exactly as described. Easily my go-to shop now.",
+    author: "Ali Raza",
+    role: "Verified Buyer",
+  },
+  {
+    id: 2,
+    rating: 5,
+    text: "Great prices and the checkout was painless. Support answered my question about stock within minutes.",
+    author: "Sana Malik",
+    role: "Verified Buyer",
+  },
+  {
+    id: 3,
+    rating: 4,
+    text: "Solid selection of accessories, and everything arrived well packaged. Will be ordering again.",
+    author: "Usman Tariq",
+    role: "Verified Buyer",
+  },
+];
+
+const SECTION_PRODUCT_COUNT = 4;
+
 export default function Home() {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [subscribed, setSubscribed] = useState(false);
 
-  const bestSellers = products.filter((p) => p.badge === "Best Seller");
-  const newArrivals = products.filter((p) => p.badge === "New");
+  // Categories — same service/hook pattern already used on the Shop page.
+  const { data: categoriesData } = useFetch(() => categoryService.list(), []);
+  const categories = Array.isArray(categoriesData) ? categoriesData : [];
+
+  // New Arrivals — most recently added products (backend default sort is
+  // createdAt desc, so no extra sort param is needed).
+  const [newArrivals, setNewArrivals] = useState([]);
+  const [newArrivalsLoading, setNewArrivalsLoading] = useState(true);
+  const [newArrivalsError, setNewArrivalsError] = useState(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    setNewArrivalsLoading(true);
+    setNewArrivalsError(null);
+
+    productService
+      .listPaged({ page: 1, limit: SECTION_PRODUCT_COUNT })
+      .then(({ products: fetched }) => {
+        if (!cancelled) setNewArrivals(fetched);
+      })
+      .catch((err) => {
+        if (!cancelled) setNewArrivalsError(err.message);
+      })
+      .finally(() => {
+        if (!cancelled) setNewArrivalsLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  // Fan Favorites — the products with the most units actually sold, via the
+  // new public GET /products/best-sellers?limit= endpoint.
+  const [bestSellers, setBestSellers] = useState([]);
+  const [bestSellersLoading, setBestSellersLoading] = useState(true);
+  const [bestSellersError, setBestSellersError] = useState(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    setBestSellersLoading(true);
+    setBestSellersError(null);
+
+    productService
+      .bestSellers(SECTION_PRODUCT_COUNT)
+      .then((fetched) => {
+        if (!cancelled) {
+          // "Best Seller" is a fact about this section, not a stored
+          // product field, so tag it on here rather than in the backend.
+          setBestSellers(fetched.map((p) => ({ ...p, badge: "Best Seller" })));
+        }
+      })
+      .catch((err) => {
+        if (!cancelled) setBestSellersError(err.message);
+      })
+      .finally(() => {
+        if (!cancelled) setBestSellersLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const handleSubscribe = (e) => {
     e.preventDefault();
     if (email) {
       setSubscribed(true);
     }
+  };
+
+  const renderProductGrid = (items, loading, error) => {
+    if (loading) {
+      return (
+        <div className={styles.productGrid}>
+          {Array.from({ length: SECTION_PRODUCT_COUNT }).map((_, i) => (
+            <ProductCardSkeleton key={i} />
+          ))}
+        </div>
+      );
+    }
+
+    if (error) {
+      return <p className={styles.eyebrow}>Couldn't load products right now.</p>;
+    }
+
+    if (items.length === 0) {
+      return <p className={styles.eyebrow}>No products yet — check back soon.</p>;
+    }
+
+    return (
+      <div className={styles.productGrid}>
+        {items.map((p) => (
+          <ProductCard key={p.id} product={p} />
+        ))}
+      </div>
+    );
   };
 
   return (
@@ -200,7 +323,9 @@ export default function Home() {
                     </svg>
                   </div>
                   <p className={styles.categoryName}>{cat.name}</p>
-                  <p className={styles.categoryCount}>{cat.count} items</p>
+                  <p className={styles.categoryCount}>
+                    {cat._count?.products ?? 0} items
+                  </p>
                 </Link>
               );
             })}
@@ -216,7 +341,7 @@ export default function Home() {
               <p className={styles.eyebrow}>Top Picks</p>
               <h2 className={styles.sectionTitle}>Fan Favorites</h2>
             </div>
-            <Link to="/shop?sort=best" className={styles.viewAllLink}>
+            <Link to="/shop" className={styles.viewAllLink}>
               View All
               <svg
                 className={styles.viewAllIcon}
@@ -233,11 +358,7 @@ export default function Home() {
               </svg>
             </Link>
           </div>
-          <div className={styles.productGrid}>
-            {bestSellers.map((p) => (
-              <ProductCard key={p.id} product={p} />
-            ))}
-          </div>
+          {renderProductGrid(bestSellers, bestSellersLoading, bestSellersError)}
         </div>
       </section>
 
@@ -299,13 +420,7 @@ export default function Home() {
               </svg>
             </Link>
           </div>
-          <div className={styles.productGrid}>
-            {(newArrivals.length > 0 ? newArrivals : products.slice(0, 4)).map(
-              (p) => (
-                <ProductCard key={p.id} product={p} />
-              ),
-            )}
-          </div>
+          {renderProductGrid(newArrivals, newArrivalsLoading, newArrivalsError)}
         </div>
       </section>
 

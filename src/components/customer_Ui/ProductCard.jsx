@@ -96,6 +96,9 @@ export default function ProductCard({ product, view = 'grid' }) {
         <div className={styles.ratingWrap}>
           <Rating value={product.rating} count={product.reviewCount} />
         </div>
+        <div className={styles.stockRow}>
+          <StockBadge stock={product.stock} />
+        </div>
         <div className={styles.gridFooterRow}>
           <div>
             <span className={styles.priceSmall}>{product.price.toFixed(2)}</span>
