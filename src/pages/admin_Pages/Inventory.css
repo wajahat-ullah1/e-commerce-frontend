@@ -1,3 +1,5 @@
+@import "../../components/admin_Ui/theme.css";
+
 .inventory-page {
   padding: 24px;
   max-width: 1400px;
@@ -65,23 +67,23 @@
 }
 
 .inventory-stat-indigo {
-  color: #4f46e5;
-  background: #eef2ff;
+  color: var(--primary-600);
+  background: var(--primary-50);
 }
 
 .inventory-stat-emerald {
-  color: #059669;
-  background: #ecfdf5;
+  color: var(--success);
+  background: var(--success-bg);
 }
 
 .inventory-stat-amber {
-  color: #d97706;
-  background: #fffbeb;
+  color: var(--warning-text);
+  background: var(--warning-bg);
 }
 
 .inventory-stat-red {
-  color: #dc2626;
-  background: #fef2f2;
+  color: var(--danger);
+  background: var(--danger-bg);
 }
 
 .inventory-stat-label {
@@ -141,7 +143,7 @@
 }
 
 .inventory-search-input:focus {
-  border-color: #6366f1;
+  border-color: var(--primary-500);
   box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.15);
 }
 
@@ -161,14 +163,14 @@
 }
 
 .inventory-status-select:focus {
-  border-color: #6366f1;
+  border-color: var(--primary-500);
   box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.15);
 }
 
 .inventory-button-icon {
   width: 14px;
   height: 14px;
-  color: #f59e0b;
+  color: var(--warning);
 }
 
 /* Tables */
@@ -255,11 +257,11 @@
 }
 
 .inventory-stock-red {
-  color: #dc2626;
+  color: var(--danger);
 }
 
 .inventory-stock-amber {
-  color: #d97706;
+  color: var(--warning-text);
 }
 
 .inventory-stock-normal {
@@ -374,7 +376,7 @@
 }
 
 .inventory-form-input:focus {
-  border-color: #6366f1;
+  border-color: var(--primary-500);
   box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.15);
 }
 
@@ -385,11 +387,11 @@
 }
 
 .inventory-change-positive {
-  color: #059669;
+  color: var(--success);
 }
 
 .inventory-change-negative {
-  color: #dc2626;
+  color: var(--danger);
 }
 
 .inventory-modal-actions {
@@ -426,13 +428,13 @@
 }
 
 .inventory-alert-amber {
-  color: #f59e0b;
+  color: var(--warning);
 }
 
 .inventory-low-stock-number {
   font-size: 18px;
   font-weight: 700;
-  color: #dc2626;
+  color: var(--danger);
 }
 
 /* Empty State */
@@ -471,11 +473,11 @@
 }
 
 .inventory-change-up {
-  color: #059669;
+  color: var(--success);
 }
 
 .inventory-change-down {
-  color: #dc2626;
+  color: var(--danger);
 }
 
 .inventory-new-stock {

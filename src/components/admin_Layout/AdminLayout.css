@@ -1,7 +1,10 @@
+@import "../admin_Ui/theme.css";
+
 .admin-layout {
   display: flex;
   height: 100vh;
   overflow: hidden;
+  font-family: var(--font-body);
 }
 
 .admin-content {
@@ -10,10 +13,11 @@
   flex-direction: column;
   min-width: 0;
   overflow-y: auto;
+  background: var(--gradient-bg-app);
 }
 
 .admin-main {
   flex: 1;
   padding: 24px;
-  background: #f8fafc;
+  background: transparent;
 }

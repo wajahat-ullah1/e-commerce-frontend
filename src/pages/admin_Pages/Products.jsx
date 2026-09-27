@@ -49,7 +49,7 @@ export default function Products() {
     const matchCat = catFilter === "all" || String(p.category?.id) === catFilter;
     const matchStock =
       stockFilter === "all" ||
-      (stockFilter === "low" && p.stock > 0 && p.stock < 10) ||
+      (stockFilter === "low" && p.stock > 0 && p.stock <= 5) ||
       (stockFilter === "out" && p.stock === 0) ||
       (stockFilter === "in" && p.stock >= 10);
     return matchSearch && matchCat && matchStock;

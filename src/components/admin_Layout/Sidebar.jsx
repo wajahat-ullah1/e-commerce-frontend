@@ -12,10 +12,10 @@ import {
   LogOut,
   ChevronDown,
   ChevronRight,
-  Boxes,
 } from "lucide-react";
 import { useState } from "react";
 import { useApp } from "../../context/useApp";
+import logoImage from "../../assets/sami-games-logo.png";
 import "./Sidebar.css";
 
 const navItems = [
@@ -109,11 +109,11 @@ export default function Sidebar({
     <div className="sidebar-content">
       {/* Logo */}
       <div className="sidebar-logo">
-        <div className="sidebar-logo-icon">
-          <Boxes className="sidebar-logo-boxes" />
-        </div>
-
-        <span className="sidebar-logo-text">ShopAdmin</span>
+        <img
+          src={logoImage}
+          alt="Sami Games"
+          className="sidebar-logo-image"
+        />
 
         {mobileOpen && (
           <button onClick={onMobileClose} className="sidebar-close-button">

@@ -1,3 +1,5 @@
+@import "../../components/admin_Ui/theme.css";
+
 .add-product-page {
   padding: 24px;
   max-width: 900px;
@@ -127,7 +129,7 @@
 }
 
 .add-product-textarea:focus {
-  border-color: #6366f1;
+  border-color: var(--primary-500);
   box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.15);
 }
 
@@ -148,7 +150,7 @@
 }
 
 .add-product-select:focus {
-  border-color: #6366f1;
+  border-color: var(--primary-500);
   box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.15);
 }
 
@@ -158,7 +160,7 @@
 
 .add-product-error {
   margin: 0;
-  color: #dc2626;
+  color: var(--danger);
   font-size: 12px;
 }
 
@@ -189,7 +191,7 @@
 }
 
 .add-product-upload-box:hover {
-  border-color: #a5b4fc;
+  border-color: var(--primary-300);
   background: rgba(238, 242, 255, 0.3);
 }
 
@@ -225,19 +227,19 @@
 /* Uploading */
 
 .add-product-uploading {
-  border-color: #c7d2fe;
+  border-color: var(--primary-200);
   cursor: default;
 }
 
 .add-product-uploading:hover {
   background: transparent;
-  border-color: #c7d2fe;
+  border-color: var(--primary-200);
 }
 
 .add-product-spinner {
   width: 32px;
   height: 32px;
-  color: #6366f1;
+  color: var(--primary-500);
   animation: add-product-spin 1s linear infinite;
 }
 
@@ -444,8 +446,8 @@
 }
 
 .add-product-image-add-tile:hover {
-  border-color: #a5b4fc;
-  color: #6366f1;
+  border-color: var(--primary-300);
+  color: var(--primary-500);
   background: rgba(238, 242, 255, 0.3);
 }
 
@@ -478,7 +480,7 @@
 
 .add-product-upload-error-title {
   margin: 0;
-  color: #dc2626;
+  color: var(--danger);
   font-size: 14px;
   font-weight: 500;
 }

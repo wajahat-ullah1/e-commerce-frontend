@@ -1,3 +1,5 @@
+@import "../../components/admin_Ui/theme.css";
+
 .products-page {
   width: 100%;
   max-width: 1400px;
@@ -86,7 +88,7 @@
 
 .products-search-input:focus,
 .products-filter-select:focus {
-  border-color: #6366f1;
+  border-color: var(--primary-500);
   box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.15);
 }
 
@@ -159,7 +161,7 @@
 .products-checkbox-cell input {
   width: 14px;
   height: 14px;
-  accent-color: #4f46e5;
+  accent-color: var(--primary-600);
   cursor: pointer;
 }
 
@@ -248,11 +250,11 @@
 }
 
 .stock-low {
-  color: #d97706;
+  color: var(--warning-text);
 }
 
 .stock-out {
-  color: #dc2626;
+  color: var(--danger);
 }
 
 .product-rating {
@@ -308,8 +310,8 @@
 }
 
 .product-delete-button:hover {
-  background: #fef2f2;
-  color: #dc2626;
+  background: var(--danger-bg);
+  color: var(--danger);
 }
 
 .product-action-button svg,

@@ -1,3 +1,5 @@
+@import "../../components/admin_Ui/theme.css";
+
 .categories-page {
   padding: 24px;
   max-width: 900px;
@@ -104,8 +106,8 @@
   width: 28px;
   height: 28px;
   border-radius: 8px;
-  background: #eef2ff;
-  color: #4f46e5;
+  background: var(--primary-50);
+  color: var(--primary-600);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -177,8 +179,8 @@
 }
 
 .categories-delete-button:hover {
-  background: #fef2f2;
-  color: #dc2626;
+  background: var(--danger-bg);
+  color: var(--danger);
 }
 
 /* Empty State */
@@ -253,9 +255,9 @@
 }
 
 .categories-image-upload-button:hover {
-  border-color: #4f46e5;
-  background: #eef2ff;
-  color: #4f46e5;
+  border-color: var(--primary-600);
+  background: var(--primary-50);
+  color: var(--primary-600);
 }
 
 .categories-image-upload-icon {
