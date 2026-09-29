@@ -17,7 +17,7 @@ const SORT_OPTIONS = [
 
 const SERVER_SORTS = new Set(["price_asc", "price_desc", "oldest"]);
 
-const LIMIT = 8;
+const LIMIT = 20;
 
 const CLIENT_FILTER_FETCH_LIMIT = 100;
 const PRICE_DEBOUNCE_MS = 400;

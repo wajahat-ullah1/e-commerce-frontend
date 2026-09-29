@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useApp } from "../../context/useApp";
+import logoImage from "../../assets/sami-games-logo.png";
 import "./Header.css";
 
 const navLinks = [
@@ -61,28 +62,15 @@ export default function Header() {
       <div className="header-container">
         {/* Desktop */}
         <div className="header-desktop">
-          <Link to="/" className="header-logo">
-            <div
-              className="header-logo-icon"
-              style={{
-                background: "linear-gradient(135deg, #7c3aed, #c026d3)",
-              }}
-            >
-              <svg
-                className="icon--logo"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={1.8}
-                  d="M7 9v3m1.5-1.5h-3M15.5 10h.01M17.5 12h.01M7.5 6h9a5 5 0 015 5v3a4 4 0 01-4 4c-.9 0-1.5-.4-2-1l-.6-.8a1.5 1.5 0 00-1.2-.6h-2.4a1.5 1.5 0 00-1.2.6l-.6.8a4 4 0 01-2 1 4 4 0 01-4-4v-3a5 5 0 015-5z"
-                />
-              </svg>
+          <Link to="/">
+            {/* Logo */}
+            <div className="header-logo">
+              <img
+                src={logoImage}
+                alt="Sami Games"
+                className="header-logo-image"
+              />
             </div>
-            <span className="header-logo-text">Sami Games</span>
           </Link>
 
           {/* Nav */}
@@ -318,27 +306,13 @@ export default function Header() {
           </button>
 
           <Link to="/" className="mobile-logo">
-            <div
-              className="mobile-logo-icon"
-              style={{
-                background: "linear-gradient(135deg, #7c3aed, #c026d3)",
-              }}
-            >
-              <svg
-                className="icon--logo"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={1.8}
-                  d="M7 9v3m1.5-1.5h-3M15.5 10h.01M17.5 12h.01M7.5 6h9a5 5 0 015 5v3a4 4 0 01-4 4c-.9 0-1.5-.4-2-1l-.6-.8a1.5 1.5 0 00-1.2-.6h-2.4a1.5 1.5 0 00-1.2.6l-.6.8a4 4 0 01-2 1 4 4 0 01-4-4v-3a5 5 0 015-5z"
-                />
-              </svg>
+            <div className="header-logo">
+              <img
+                src={logoImage}
+                alt="Sami Games"
+                className="header-logo-image"
+              />
             </div>
-            <span className="mobile-logo-text">Sami Games</span>
           </Link>
 
           <div className="mobile-actions">

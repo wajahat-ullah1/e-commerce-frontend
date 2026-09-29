@@ -34,37 +34,23 @@
 .header-logo {
   display: flex;
   align-items: center;
-  gap: 0.625rem;
-  flex-shrink: 0;
-  text-decoration: none;
-}
-
-.header-logo-icon,
-.mobile-logo-icon {
-  display: flex;
-  align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #7c3aed, #c026d3);
-  border-radius: 0.6rem;
-  box-shadow: 0 4px 14px rgba(124, 58, 237, 0.35);
+  gap: 10px;
+  padding: 18px 16px 16px;
+  border-bottom: 1px solid var(--dark-border-soft);
+  position: relative;
+  z-index: 1;
+  background: transparent;
 }
 
-.header-logo-icon {
-  width: 2.1rem;
-  height: 2.1rem;
-}
-
-.icon--logo {
-  width: 1.25rem;
-  height: 1.25rem;
-  color: #fff;
-}
-
-.header-logo-text {
-  font-size: 1.125rem;
-  font-weight: 800;
-  letter-spacing: -0.025em;
-  color: #f5f3ff;
+.header-logo-image {
+  height: 88px;
+  width: auto;
+  max-width: 100%;
+  object-fit: contain;
+  background: transparent;
+  filter: none;
+  animation: floatSoft 4.5s ease-in-out infinite;
 }
 
 .header-nav {

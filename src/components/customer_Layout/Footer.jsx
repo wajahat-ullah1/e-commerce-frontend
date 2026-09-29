@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import logoImage from "../../assets/sami-games-logo.png";
 import "./Footer.css";
 
 const footerLinks = {
@@ -30,25 +31,13 @@ export default function Footer() {
           {/* Brand */}
           <div className="footer-brand">
             <Link to="/" className="footer-logo">
-              <div
-                className="footer-logo-icon"
-                style={{
-                  background: "linear-gradient(135deg, #7c3aed, #c026d3)",
-                }}
-              >
-                <svg
-                  className="icon--logo"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={1.8}
-                    d="M7 9v3m1.5-1.5h-3M15.5 10h.01M17.5 12h.01M7.5 6h9a5 5 0 015 5v3a4 4 0 01-4 4c-.9 0-1.5-.4-2-1l-.6-.8a1.5 1.5 0 00-1.2-.6h-2.4a1.5 1.5 0 00-1.2.6l-.6.8a4 4 0 01-2 1 4 4 0 01-4-4v-3a5 5 0 015-5z"
-                  />
-                </svg>
+              {/* Logo */}
+              <div>
+                <img
+                  src={logoImage}
+                  alt="Sami Games"
+                  className="footer-logo-image"
+                />
               </div>
               <span className="footer-logo-text">Sami Games</span>
             </Link>

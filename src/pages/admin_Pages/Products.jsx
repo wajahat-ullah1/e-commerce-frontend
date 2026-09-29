@@ -229,7 +229,7 @@ export default function Products() {
                       </td>
                       <td className="product-category">{p.category?.name}</td>
                       <td className="product-price">
-                        {Number(p.price).toFixed(2)}
+                        Rs {Number(p.price)}
                       </td>
                       <td className="product-stock">
                         <span

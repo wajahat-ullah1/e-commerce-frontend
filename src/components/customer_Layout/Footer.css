@@ -31,21 +31,14 @@
   text-decoration: none;
 }
 
-.footer-logo-icon {
-  width: 2.1rem;
-  height: 2.1rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: linear-gradient(135deg, #7c3aed, #c026d3);
-  border-radius: 0.6rem;
-  box-shadow: 0 4px 14px rgba(124, 58, 237, 0.3);
-}
-
-.footer-logo-svg {
-  width: 1.25rem;
-  height: 1.25rem;
-  color: #fff;
+.footer-logo-image {
+  height: 88px;
+  width: auto;
+  max-width: 100%;
+  object-fit: contain;
+  background: transparent;
+  filter: none;
+  animation: floatSoft 4.5s ease-in-out infinite;
 }
 
 .footer-logo-text {
