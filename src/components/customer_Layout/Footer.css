@@ -9,7 +9,7 @@
 .footer-container {
   max-width: 80rem;
   margin: 0 auto;
-  padding: 4rem 1rem;
+  padding: clamp(2.5rem, 6vw, 4rem) 1rem;
 }
 
 .footer-grid {
@@ -20,6 +20,7 @@
 
 .footer-brand {
   grid-column: span 1;
+  min-width: 0;
 }
 
 .footer-logo {
@@ -32,7 +33,7 @@
 }
 
 .footer-logo-image {
-  height: 88px;
+  height: clamp(3.5rem, 9vw, 5.5rem);
   width: auto;
   max-width: 100%;
   object-fit: contain;
@@ -43,7 +44,7 @@
 
 .footer-logo-text {
   color: #f5f3ff;
-  font-size: 1.125rem;
+  font-size: clamp(1rem, 0.9583rem + 0.2083vw, 1.125rem);
   font-weight: 800;
 }
 
@@ -51,7 +52,7 @@
   max-width: 20rem;
   margin: 0;
   color: #7c7c9c;
-  font-size: 0.875rem;
+  font-size: clamp(0.8125rem, 0.7917rem + 0.1042vw, 0.875rem);
   line-height: 1.625;
 }
 
@@ -98,7 +99,7 @@
 .footer-column-title {
   margin: 0 0 1rem;
   color: #f5f3ff;
-  font-size: 0.875rem;
+  font-size: clamp(0.8125rem, 0.7917rem + 0.1042vw, 0.875rem);
   font-weight: 700;
 }
 
@@ -113,7 +114,7 @@
 
 .footer-link {
   color: #7c7c9c;
-  font-size: 0.875rem;
+  font-size: clamp(0.8125rem, 0.7917rem + 0.1042vw, 0.875rem);
   text-decoration: none;
   transition: color 0.2s ease;
 }
@@ -135,13 +136,16 @@
 .footer-copyright {
   margin: 0;
   color: #6b6b85;
-  font-size: 0.875rem;
+  font-size: clamp(0.8125rem, 0.7917rem + 0.1042vw, 0.875rem);
 }
 
 .footer-legal-links {
   display: flex;
   align-items: center;
   gap: 1.5rem;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.75rem 1.5rem;
 }
 
 .footer-legal-link {
@@ -155,7 +159,7 @@
   color: #d1d1e0;
 }
 
-@media (min-width: 640px) {
+@media (min-width: 40em) {
   .footer-container {
     padding-left: 1.5rem;
     padding-right: 1.5rem;
@@ -167,18 +171,24 @@
   }
 }
 
-@media (min-width: 768px) {
+@media (min-width: 48em) {
   .footer-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
-@media (min-width: 1024px) {
+@media (min-width: 64em) {
   .footer-grid {
     grid-template-columns: repeat(5, minmax(0, 1fr));
   }
 
   .footer-brand {
     grid-column: span 2;
+  }
+}
+
+@media (max-width: 39.9375em) {
+  .footer-bottom {
+    text-align: center;
   }
 }

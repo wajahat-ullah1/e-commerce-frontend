@@ -1,9 +1,7 @@
 import { useState } from "react";
 import { Menu } from "lucide-react";
-import { useNavigate, useSearchParams } from "react-router-dom";
-import { useFetch } from "../../hooks/useFetch";
-import { categoryService } from "../../services/categoryService";
-import { SIDEBAR_CATEGORY_PRESETS } from "../../data/sidebarCategories";
+import { useNavigate } from "react-router-dom";
+import { useCategoryItems } from "./CategoryList.jsx";
 import "./Sidebar.css";
 
 // A slim icon-only rail, fixed to the viewport (stays put on scroll). A
@@ -11,31 +9,12 @@ import "./Sidebar.css";
 // never renders underneath it. On hover it expands as an overlay (painted
 // above the page, not pushing it) with a pink "Menu" header row on top and
 // a dimmed/blurred backdrop behind the rest of the screen.
+// Desktop only (>= 1024px). Below that the header switches to its hamburger
+// layout and the same categories live in the MobileDrawer's Categories tab.
 export default function Sidebar() {
   const navigate = useNavigate();
-  const [params] = useSearchParams();
   const [expanded, setExpanded] = useState(false);
-
-  const activeCategoryId = params.get("category")
-    ? Number(params.get("category"))
-    : null;
-
-  const { data: categoriesData } = useFetch(() => categoryService.list(), []);
-  const categories = Array.isArray(categoriesData) ? categoriesData : [];
-
-  const categoryByPresetName = new Map(
-    categories.map((c) => [c.name.trim().toLowerCase(), c]),
-  );
-
-  const items = SIDEBAR_CATEGORY_PRESETS.map((preset) => {
-    const matchedCategory = categoryByPresetName.get(preset.name.toLowerCase());
-    return {
-      preset,
-      matchedCategory,
-      isConnected: Boolean(matchedCategory),
-      isActive: Boolean(matchedCategory) && activeCategoryId === matchedCategory.id,
-    };
-  });
+  const items = useCategoryItems();
 
   return (
     <div className="app-sidebar-wrap">
@@ -55,20 +34,21 @@ export default function Sidebar() {
         <nav className="app-sidebar-nav">
           {items.map((item) => {
             const Icon = item.preset.icon;
+            const showSoon = item.loaded && !item.isConnected;
             return (
               <button
                 key={item.preset.name}
                 type="button"
                 title={
-                  item.isConnected
-                    ? item.preset.name
-                    : `${item.preset.name} (not created yet)`
+                  showSoon
+                    ? `${item.preset.name} (not created yet)`
+                    : item.preset.name
                 }
                 disabled={!item.isConnected}
                 className={[
                   "app-sidebar-item",
                   item.isActive ? "is-active" : "",
-                  !item.isConnected ? "is-disabled" : "",
+                  showSoon ? "is-disabled" : "",
                 ]
                   .filter(Boolean)
                   .join(" ")}
@@ -81,10 +61,8 @@ export default function Sidebar() {
               >
                 <Icon className="app-sidebar-icon" />
                 <span className="app-sidebar-label">{item.preset.name}</span>
-                {!item.isConnected && (
-                  <span className="app-sidebar-label app-sidebar-tag">
-                    Soon
-                  </span>
+                {showSoon && (
+                  <span className="app-sidebar-label app-sidebar-tag">Soon</span>
                 )}
               </button>
             );

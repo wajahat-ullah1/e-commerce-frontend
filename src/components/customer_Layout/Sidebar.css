@@ -3,7 +3,7 @@
    its own; the actual sidebar below is position: fixed and independent of
    this element's position once the page scrolls. */
 .app-sidebar-wrap {
-  width: 64px;
+  width: 4rem;
   flex-shrink: 0;
 }
 
@@ -24,7 +24,8 @@
   top: 0;
   left: 0;
   height: 100vh;
-  width: 64px;
+  height: 100dvh;
+  width: 4rem;
   display: flex;
   flex-direction: column;
   background: #ffffff;
@@ -35,7 +36,7 @@
 }
 
 .app-sidebar.is-expanded {
-  width: 240px;
+  width: 15rem;
   box-shadow: 8px 0 28px rgba(0, 0, 0, 0.12);
 }
 
@@ -43,9 +44,9 @@
 .app-sidebar-header {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 0.875rem;
   width: 100%;
-  padding: 24px 21px;
+  padding: 1.5rem 1.3125rem;
   background: #ec1279;
   color: #ffffff;
   flex-shrink: 0;
@@ -57,27 +58,27 @@
 
 .app-sidebar-header .app-sidebar-label {
   font-weight: 700;
-  font-size: 15px;
+  font-size: clamp(0.875rem, 0.8542rem + 0.1042vw, 0.9375rem);
 }
 
 .app-sidebar-nav {
   display: flex;
   flex-direction: column;
   flex: 1;
-  padding: 12px 0;
+  padding: 0.75rem 0;
   overflow-y: auto;
 }
 
 .app-sidebar-item {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 0.875rem;
   width: 100%;
-  padding: 11px 21px;
+  padding: 0.6875rem 1.3125rem;
   border: none;
   background: none;
   color: #71717a;
-  font-size: 14px;
+  font-size: clamp(0.8125rem, 0.7917rem + 0.1042vw, 0.875rem);
   white-space: nowrap;
   cursor: pointer;
   flex-shrink: 0;
@@ -106,8 +107,8 @@
 }
 
 .app-sidebar-icon {
-  width: 20px;
-  height: 20px;
+  width: 1.25rem;
+  height: 1.25rem;
   flex-shrink: 0;
 }
 
@@ -123,12 +124,24 @@
 
 .app-sidebar.is-expanded .app-sidebar-label {
   opacity: 1;
-  max-width: 160px;
+  max-width: 10rem;
 }
 
 .app-sidebar-tag {
   margin-left: auto;
-  font-size: 10px;
+  font-size: 0.625rem;
   color: #a1a1aa;
   flex: 1;
+}
+
+/* Below 1024px the header switches to the hamburger layout and the categories
+   move into its slide-out drawer, so the rail is hidden. Width only: do NOT
+   use (hover: none) here, DevTools device mode and touch laptops report it
+   and would hide the sidebar on large screens too. */
+@media (max-width: 63.9375em) {
+  .app-sidebar-wrap,
+  .app-sidebar,
+  .app-sidebar-backdrop {
+    display: none;
+  }
 }

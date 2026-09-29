@@ -47,5 +47,5 @@
 }
 
 .numsm { width: 2rem; height: 1.75rem; font-size: 0.75rem; }
-.nummd { width: 2.5rem; height: 2.25rem; font-size: 0.875rem; }
-.numlg { width: 3rem; height: 2.75rem; font-size: 1rem; }
+.nummd { width: 2.5rem; height: 2.25rem; font-size: clamp(0.8125rem, 0.7917rem + 0.1042vw, 0.875rem); }
+.numlg { width: 3rem; height: 2.75rem; font-size: clamp(0.9375rem, 0.9167rem + 0.1042vw, 1rem); }

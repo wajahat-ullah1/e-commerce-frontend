@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useApp } from "../../context/useApp";
 import logoImage from "../../assets/sami-games-logo.png";
+import MobileDrawer from "./MobileDrawer.jsx";
 import "./Header.css";
 
 const navLinks = [
@@ -272,7 +273,8 @@ export default function Header() {
           <button
             onClick={() => setMobileOpen((v) => !v)}
             className="mobile-menu-button"
-            aria-label="Toggle menu"
+            aria-label="Open menu"
+            aria-expanded={mobileOpen}
           >
             {mobileOpen ? (
               <svg
@@ -433,44 +435,17 @@ export default function Header() {
         )}
       </div>
 
-      {/* Mobile Nav Drawer */}
-      {mobileOpen && (
-        <div className="mobile-nav-drawer">
-          <nav className="mobile-nav">
-            {navLinks.map((link) => (
-              <Link key={link.label} to={link.to} className="mobile-nav-link">
-                {link.label}
-              </Link>
-            ))}
-
-            <div className="mobile-account-links">
-              {isLoggedIn ? (
-                <>
-                  <Link to="/account" className="mobile-account-link">
-                    My Account
-                  </Link>
-                  <Link to="/account/orders" className="mobile-account-link">
-                    My Orders
-                  </Link>
-                  <button
-                    onClick={() => {
-                      logout();
-                      navigate("/");
-                    }}
-                    className="mobile-logout-button"
-                  >
-                    Logout
-                  </button>
-                </>
-              ) : (
-                <Link to="/login" className="mobile-sign-in">
-                  Sign In / Register
-                </Link>
-              )}
-            </div>
-          </nav>
-        </div>
-      )}
+      {/* Mobile / tablet drawer: Categories tab (default) + Menu tab */}
+      <MobileDrawer
+        open={mobileOpen}
+        onClose={() => setMobileOpen(false)}
+        navLinks={navLinks}
+        isLoggedIn={isLoggedIn}
+        onLogout={() => {
+          logout();
+          navigate("/");
+        }}
+      />
     </header>
   );
 }

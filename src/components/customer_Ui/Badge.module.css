@@ -3,7 +3,7 @@
 .badge {
   display: inline-flex;
   align-items: center;
-  border-radius: 9999px;
+  border-radius: 624.9375rem;
   font-weight: 600;
 }
 
@@ -13,7 +13,7 @@
 }
 
 .md {
-  font-size: 0.875rem;
+  font-size: clamp(0.8125rem, 0.7917rem + 0.1042vw, 0.875rem);
   padding: 0.25rem 0.625rem;
 }
 

@@ -37,7 +37,7 @@
 }
 
 .listImageWrap {
-  width: 11rem;
+  width: clamp(7.5rem, 22vw, 11rem);
   flex-shrink: 0;
   background: var(--color-slate-50);
   overflow: hidden;
@@ -49,6 +49,7 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  min-width: 0;
 }
 
 .listTopRow {
@@ -64,6 +65,7 @@
   color: var(--color-slate-900);
   margin-top: 0.125rem;
   transition: color 0.2s ease;
+  overflow-wrap: anywhere;
 }
 
 .listTitle:hover {
@@ -71,7 +73,7 @@
 }
 
 .listDescription {
-  font-size: 0.875rem;
+  font-size: clamp(0.8125rem, 0.7917rem + 0.1042vw, 0.875rem);
   color: var(--color-slate-500);
   margin-top: 0.5rem;
 }
@@ -81,16 +83,19 @@
   align-items: center;
   justify-content: space-between;
   margin-top: 1rem;
+  flex-wrap: wrap;
+  gap: 0.75rem;
 }
 
 .priceLarge {
-  font-size: 1.125rem;
+  font-size: clamp(1rem, 0.9583rem + 0.2083vw, 1.125rem);
   font-weight: 700;
   color: var(--color-slate-900);
+  white-space: nowrap;
 }
 
 .originalPriceLarge {
-  font-size: 0.875rem;
+  font-size: clamp(0.8125rem, 0.7917rem + 0.1042vw, 0.875rem);
   color: var(--color-slate-400);
   text-decoration: line-through;
   margin-left: 0.5rem;
@@ -100,6 +105,7 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  flex-wrap: wrap;
 }
 
 .wishlistButtonList {
@@ -131,12 +137,13 @@
   padding: 0.5rem 1rem;
   background: var(--color-slate-900);
   color: var(--color-white);
-  font-size: 0.875rem;
+  font-size: clamp(0.8125rem, 0.7917rem + 0.1042vw, 0.875rem);
   font-weight: 500;
   border-radius: var(--radius-md);
   border: none;
   cursor: pointer;
   transition: background-color 0.2s ease;
+  white-space: nowrap;
 }
 
 .addButtonList:hover:not(:disabled) {
@@ -156,6 +163,11 @@
   border-radius: var(--radius-lg);
   overflow: hidden;
   transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  /* the card reacts to ITS OWN width (grid cell), not the screen width */
+  container-type: inline-size;
 }
 
 .gridCard:hover {
@@ -208,15 +220,20 @@
 
 .gridBody {
   padding: 1rem;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
 }
 
 .gridTitle {
   font-weight: 600;
-  font-size: 0.875rem;
+  font-size: clamp(0.8125rem, 0.7917rem + 0.1042vw, 0.875rem);
   line-height: 1.35;
   color: var(--color-slate-900);
   margin-top: 0.25rem;
   transition: color 0.2s ease;
+  overflow-wrap: anywhere;
 }
 
 .gridTitle:hover {
@@ -229,21 +246,25 @@
 
 .stockRow {
   margin-top: 0.5rem;
+  margin-bottom: 0.75rem;
 }
 
 .gridFooterRow {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-top: 0.75rem;
+  margin-top: auto;
   padding-top: 0.75rem;
   border-top: 1px solid var(--color-slate-50);
+  flex-wrap: wrap;
+  gap: 0.5rem;
 }
 
 .priceSmall {
-  font-size: 1rem;
+  font-size: clamp(0.9375rem, 0.9167rem + 0.1042vw, 1rem);
   font-weight: 700;
   color: var(--color-slate-900);
+  white-space: nowrap;
 }
 
 .originalPriceSmall {
@@ -263,6 +284,8 @@
   border: none;
   cursor: pointer;
   transition: background-color 0.2s ease;
+  white-space: nowrap;
+  min-height: 2.25rem;
 }
 
 .addButtonGrid:hover:not(:disabled) {
@@ -272,4 +295,83 @@
 .addButtonGrid:disabled {
   opacity: 0.4;
   cursor: not-allowed;
+}
+
+/* ---------- Responsive ---------- */
+
+/* Card is narrow (2-column phones, small grid cells): stack price + button */
+@container (max-width: 13rem) {
+  .gridBody {
+    padding: 0.75rem;
+  }
+
+  .gridFooterRow {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .addButtonGrid {
+    width: 100%;
+    padding-block: 0.5rem;
+  }
+
+  .badgeOverlay {
+    top: 0.5rem;
+    left: 0.5rem;
+  }
+
+  .wishlistButtonGrid {
+    top: 0.5rem;
+    right: 0.5rem;
+  }
+}
+
+/* Touch screens have no hover, so always show the wishlist heart */
+@media (hover: none) {
+  .wishlistHidden {
+    opacity: 1;
+  }
+}
+
+/* Bigger tap targets on touch screens */
+@media (pointer: coarse) {
+  .wishlistButtonGrid,
+  .wishlistButtonList {
+    width: 2.75rem;
+    height: 2.75rem;
+  }
+
+  .addButtonGrid,
+  .addButtonList {
+    min-height: 2.75rem;
+  }
+}
+
+/* List view: stack image on top on phones */
+@media (max-width: 40em) {
+  .listCard {
+    flex-direction: column;
+  }
+
+  .listImageWrap {
+    width: 100%;
+    aspect-ratio: 16 / 10;
+  }
+
+  .listBody {
+    padding: 1rem;
+  }
+
+  .listFooterRow {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .listActions {
+    justify-content: space-between;
+  }
+
+  .addButtonList {
+    flex: 1;
+  }
 }

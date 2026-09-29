@@ -1,0 +1,230 @@
+/* Mobile / tablet slide-out drawer (Categories + Menu tabs) */
+
+.mdrawer-root {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+}
+
+.mdrawer-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+  animation: mdrawer-fade 0.2s ease;
+}
+
+.mdrawer-panel {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: min(22rem, 88vw);
+  display: flex;
+  flex-direction: column;
+  background: #0b0712;
+  color: #e5e5f0;
+  border-right: 1px solid rgba(192, 132, 252, 0.18);
+  box-shadow: 0.5rem 0 2rem rgba(0, 0, 0, 0.5);
+  animation: mdrawer-slide 0.25s ease;
+}
+
+/* ---- top bar ---- */
+.mdrawer-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.5rem 0.75rem 0.5rem 1rem;
+  border-bottom: 1px solid rgba(192, 132, 252, 0.12);
+  flex-shrink: 0;
+}
+
+.mdrawer-logo {
+  height: 2.75rem;
+  width: auto;
+  max-width: 60%;
+  object-fit: contain;
+}
+
+.mdrawer-close {
+  display: grid;
+  place-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border: 0;
+  border-radius: 0.75rem;
+  background: transparent;
+  color: #c9c9dc;
+  cursor: pointer;
+}
+
+.mdrawer-close:hover {
+  background: rgba(192, 132, 252, 0.1);
+}
+
+.mdrawer-close-icon {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+/* ---- tabs ---- */
+.mdrawer-tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  flex-shrink: 0;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.mdrawer-tab {
+  padding: 0.875rem 0.5rem;
+  border: 0;
+  border-bottom: 0.1875rem solid transparent;
+  background: transparent;
+  color: #8b8ba3;
+  font-size: 0.875rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: color 0.15s ease, background 0.15s ease;
+}
+
+.mdrawer-tab.is-active {
+  color: #ffffff;
+  background: rgba(236, 18, 121, 0.1);
+  border-bottom-color: #ec1279;
+}
+
+/* ---- scrolling body ---- */
+.mdrawer-body {
+  flex: 1;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* ---- Categories tab ---- */
+.cat-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.cat-list-item {
+  display: flex;
+  align-items: center;
+  gap: 0.875rem;
+  width: 100%;
+  min-height: 3rem;
+  padding: 0.75rem 1.25rem;
+  border: 0;
+  border-bottom: 1px solid rgba(192, 132, 252, 0.08);
+  border-left: 0.1875rem solid transparent;
+  background: transparent;
+  color: #c9c9dc;
+  font-size: 0.9375rem;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.cat-list-item:hover {
+  background: rgba(236, 18, 121, 0.08);
+  color: #f472b6;
+}
+
+.cat-list-item.is-active {
+  background: rgba(236, 18, 121, 0.14);
+  border-left-color: #ec1279;
+  color: #f472b6;
+  font-weight: 600;
+}
+
+.cat-list-item.is-disabled {
+  color: #56566b;
+  cursor: not-allowed;
+}
+
+.cat-list-item.is-disabled:hover {
+  background: transparent;
+  color: #56566b;
+}
+
+.cat-list-icon {
+  width: 1.25rem;
+  height: 1.25rem;
+  flex-shrink: 0;
+}
+
+.cat-list-name {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.cat-list-tag {
+  margin-left: auto;
+  font-size: 0.6875rem;
+  color: #6b6b82;
+}
+
+/* ---- Menu tab ---- */
+.mdrawer-menu {
+  padding: 0.75rem;
+}
+
+.mdrawer-link {
+  display: block;
+  width: 100%;
+  padding: 0.75rem;
+  border: 0;
+  border-radius: 0.75rem;
+  background: transparent;
+  color: #c9c9dc;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.mdrawer-link:hover {
+  background: rgba(192, 132, 252, 0.08);
+}
+
+.mdrawer-account {
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid rgba(192, 132, 252, 0.12);
+}
+
+.mdrawer-logout {
+  color: #f87171;
+}
+
+.mdrawer-logout:hover {
+  background: rgba(239, 68, 68, 0.12);
+}
+
+.mdrawer-signin {
+  color: #e879f9;
+}
+
+@keyframes mdrawer-slide {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(0); }
+}
+
+@keyframes mdrawer-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Desktop shows the sidebar rail instead */
+@media (min-width: 64em) {
+  .mdrawer-root {
+    display: none;
+  }
+}
